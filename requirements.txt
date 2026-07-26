@@ -1,0 +1,28 @@
+# ============================================================
+#  HealthBot — Core Dependencies
+# ============================================================
+# Base install is intentionally light: everything the chatbot, the
+# structured ML predictor, and the Flask + HTML/CSS/JS frontend need to
+# run end to end, and nothing more. Heavy/optional extras (BioBERT
+# semantic matching, scikit-fuzzy phrase grading, an extra LightGBM
+# training candidate) live in requirements-optional.txt — see that file
+# and .env.example for how to turn each one on.
+
+# ── Web server ───────────────────────────────────────────────
+flask==3.0.3
+
+# ── Machine Learning ─────────────────────────────────────────
+scikit-learn==1.5.2
+numpy==1.26.4
+pandas==2.2.3
+joblib==1.4.2
+scipy==1.14.1
+
+# ── Environment & Config ─────────────────────────────────────
+python-dotenv==1.0.1
+
+# ── Visualization (training-time confusion matrix only) ───────
+matplotlib==3.9.2
+
+# ── Utilities (Ollama HTTP client) ────────────────────────────
+requests==2.32.3

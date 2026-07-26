@@ -1,0 +1,26 @@
+# ============================================================
+#  HealthBot — Optional Extras
+# ============================================================
+# Nothing in requirements.txt depends on these. Install only the group(s)
+# you actually want; each is gated behind its own .env flag (see
+# .env.example) and every module that uses one fails closed if it's
+# missing — the app still runs fine without any of this file installed.
+
+# ── BioBERT semantic symptom matcher (utils/biobert_embedder.py) ──
+# Catches symptom phrasing the dictionary + fuzzy matcher miss, by
+# embedding the sentence and comparing it to DDXPlus evidence aliases.
+# Enable with BIOBERT_ENABLED=True in .env.
+transformers==4.46.3
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.4.1+cpu
+
+# ── Fuzzy phrase grading (utils/fuzzy_symptom_matcher.py) ─────────
+# Without this, the matcher still works via difflib.SequenceMatcher —
+# scikit-fuzzy just adds proper fuzzy-set membership grading on top.
+scikit-fuzzy==0.5.0
+
+# ── Extra training candidate (model/train.py) ─────────────────────
+# A gradient-boosted-tree candidate alongside the Naive Bayes / linear-SGD
+# baselines already in train.py, included in the model comparison only
+# when USE_LIGHTGBM_CANDIDATE=True in .env.
+lightgbm==4.5.0

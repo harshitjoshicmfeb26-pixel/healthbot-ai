@@ -1,0 +1,53 @@
+,precision,recall,f1-score,support
+Acute COPD exacerbation / infection,1.0,1.0,1.0,800.0
+Acute dystonic reactions,1.0,1.0,1.0,1227.0
+Acute laryngitis,0.9983150800336984,0.9908026755852842,0.9945446915652539,1196.0
+Acute otitis media,1.0,0.9992348890589136,0.9996172981247609,1307.0
+Acute pulmonary edema,1.0,1.0,1.0,966.0
+Acute rhinosinusitis,0.9911190053285968,0.8205882352941176,0.8978278358809332,680.0
+Allergic sinusitis,1.0,1.0,1.0,896.0
+Anaphylaxis,1.0,1.0,1.0,1412.0
+Anemia,1.0,1.0,1.0,2543.0
+Atrial fibrillation,1.0,1.0,1.0,1052.0
+Boerhaave,1.0,1.0,1.0,774.0
+Bronchiectasis,1.0,1.0,1.0,912.0
+Bronchiolitis,1.0,1.0,1.0,13.0
+Bronchitis,1.0,1.0,1.0,1336.0
+Bronchospasm / acute asthma exacerbation,1.0,1.0,1.0,826.0
+Chagas,1.0,1.0,1.0,400.0
+Chronic rhinosinusitis,0.8927943760984183,0.9951028403525954,0.9411764705882353,1021.0
+Cluster headache,1.0,1.0,1.0,1050.0
+Croup,1.0,1.0,1.0,128.0
+Ebola,1.0,1.0,1.0,37.0
+Epiglottitis,1.0,1.0,1.0,879.0
+GERD,1.0,1.0,1.0,1317.0
+Guillain-Barré syndrome,1.0,1.0,1.0,967.0
+HIV (initial infection),1.0,1.0,1.0,1457.0
+Influenza,1.0,1.0,1.0,1321.0
+Inguinal hernia,1.0,1.0,1.0,1022.0
+Larygospasm,1.0,1.0,1.0,292.0
+Localized edema,1.0,1.0,1.0,1388.0
+Myasthenia gravis,1.0,1.0,1.0,823.0
+Myocarditis,1.0,0.9981785063752276,0.9990884229717412,549.0
+PSVT,0.9978021978021978,1.0,0.9988998899889989,908.0
+Pancreatic neoplasm,1.0,1.0,1.0,961.0
+Panic attack,1.0,1.0,1.0,1259.0
+Pericarditis,1.0,1.0,1.0,1150.0
+Pneumonia,1.0,1.0,1.0,1316.0
+Possible NSTEMI / STEMI,1.0,1.0,1.0,1082.0
+Pulmonary embolism,1.0,1.0,1.0,1367.0
+Pulmonary neoplasm,0.9985994397759104,1.0,0.9992992291520673,713.0
+SLE,1.0,1.0,1.0,581.0
+Sarcoidosis,1.0,1.0,1.0,1079.0
+Scombroid food poisoning,1.0,1.0,1.0,924.0
+Spontaneous pneumothorax,1.0,1.0,1.0,499.0
+Spontaneous rib fracture,1.0,1.0,1.0,289.0
+Stable angina,0.953763440860215,1.0,0.9763346175013758,887.0
+Tuberculosis,1.0,1.0,1.0,773.0
+URTI,1.0,0.9996922129886119,0.9998460828074496,3249.0
+Unstable angina,1.0,0.9598130841121495,0.9794945159752027,1070.0
+Viral pharyngitis,0.9964584674822924,0.999354213755247,0.9979042398839272,3097.0
+Whooping cough,1.0,1.0,1.0,204.0
+accuracy,0.996279925598512,0.996279925598512,0.996279925598512,0.996279925598512
+macro avg,0.9965071838241087,0.9951585032147376,0.9955925162130601,49999.0
+weighted avg,0.9965502241912942,0.996279925598512,0.9962302776278879,49999.0

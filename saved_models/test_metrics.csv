@@ -1,0 +1,2 @@
+model,accuracy,macro_f1,weighted_f1,top3_accuracy,top5_accuracy
+sgd_log_loss,0.996279925598512,0.9955925162130601,0.9962302776278879,1.0,1.0
