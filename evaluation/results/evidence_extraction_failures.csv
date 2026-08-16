@@ -14,8 +14,6 @@ G04,G_romanized_marathi,romanized_marathi,laghvila jaljal,romanized_marathi,burn
 J02,J_contraction_negation,english,I can't breathe,english,I can't breathe,,,,E_66,,,False,False,,negation trigger gap,contraction and safety edge
 K02,K_multiple_negated,english,I deny fever and cough,english,fever cough,E_201; E_91,,,E_201; E_91,,E_201,False,False,,negation-scope error; lexical coverage gap,shared trigger
 L02,L_mixed_polarity,english,I deny chest pain but have shortness of breath,english,chest pain shortness of breath,E_53; E_55_@_V_29; E_66,,E_66,E_53; E_55_@_V_29,E_66,E_55_@_V_29,True,True,chest pain; shortness of breath,negation-scope error; lexical coverage gap,mixed safety case
-M01,M_temporal_reassertion,english,I had no chest pain yesterday but today it started,english,chest pain,,E_53; E_55_@_V_29,E_53; E_55_@_V_29,,E_55_@_V_29,,True,False,,temporal reasoning error; red-flag detection failure,known temporal failure
-M04,M_temporal_reassertion,english,The headache resolved and returned this morning,english,headache,,E_53; E_55_@_V_11,E_53; E_55_@_V_11,,E_55_@_V_11,,False,False,,temporal reasoning error,temporal transition
 N02,N_pseudo_negation,english,Cough cannot be ruled out,english,cough,,E_201,E_201,,E_201,,False,False,,lexical coverage gap,pseudo-negation
 O03,O_multiple_positive,hinglish,"bukhar, dast aur ulti",hinglish,fever diarrhea vomiting,E_91,,E_211; E_51; E_91,,E_91,E_91,False,False,,lexical coverage gap,multiple Hinglish symptoms
 P03,P_pain_location,english,pain in the groin,english,pain in the groin,E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,lexical coverage gap,laterality intentionally unresolved

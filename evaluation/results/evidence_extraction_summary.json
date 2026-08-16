@@ -7,55 +7,55 @@
     "production_code_modified": false
   },
   "positive_evidence": {
-    "precision": 0.8773584905660378,
-    "recall": 0.768595041322314,
-    "f1": 0.8193832599118943,
-    "true_positive_count": 93,
+    "precision": 0.8818181818181818,
+    "recall": 0.8016528925619835,
+    "f1": 0.8398268398268398,
+    "true_positive_count": 97,
     "false_positive_count": 13,
-    "false_negative_count": 28,
-    "exact_set_match_rate": 0.7291666666666666,
+    "false_negative_count": 24,
+    "exact_set_match_rate": 0.75,
     "average_false_positive_count": 0.13541666666666666,
     "utterances_with_false_positive_pct": 9.375,
-    "utterances_with_missed_evidence_pct": 19.791666666666668
+    "utterances_with_missed_evidence_pct": 17.708333333333332
   },
   "denied_evidence": {
-    "precision": 0.8275862068965517,
+    "precision": 0.96,
     "recall": 0.8275862068965517,
-    "f1": 0.8275862068965517,
+    "f1": 0.888888888888889,
     "true_positive_count": 24,
-    "false_positive_count": 5,
+    "false_positive_count": 1,
     "false_negative_count": 5,
-    "exact_set_match_rate": 0.9375,
-    "average_false_positive_count": 0.052083333333333336,
-    "utterances_with_false_positive_pct": 3.125,
+    "exact_set_match_rate": 0.9583333333333334,
+    "average_false_positive_count": 0.010416666666666666,
+    "utterances_with_false_positive_pct": 1.0416666666666667,
     "utterances_with_missed_evidence_pct": 3.125
   },
   "initial_evidence": {
     "defined_case_count": 75,
-    "correct_count": 47,
-    "accuracy": 0.6266666666666667
+    "correct_count": 49,
+    "accuracy": 0.6533333333333333
   },
   "red_flags": {
     "case_count": 96,
-    "false_negative_count": 1,
+    "false_negative_count": 0,
     "precision": 1.0,
-    "recall": 0.9375,
-    "f1": 0.967741935483871
+    "recall": 1.0,
+    "f1": 1.0
   },
   "language_metrics": [
     {
       "group": "english",
       "rows": 71,
-      "precision": 0.8333333333333334,
-      "recall": 0.8125,
-      "f1": 0.8227848101265822,
-      "true_positive_count": 65,
+      "precision": 0.8414634146341463,
+      "recall": 0.8625,
+      "f1": 0.8518518518518519,
+      "true_positive_count": 69,
       "false_positive_count": 13,
-      "false_negative_count": 15,
-      "exact_set_match_rate": 0.7464788732394366,
+      "false_negative_count": 11,
+      "exact_set_match_rate": 0.7746478873239436,
       "average_false_positive_count": 0.18309859154929578,
       "utterances_with_false_positive_pct": 12.67605633802817,
-      "utterances_with_missed_evidence_pct": 15.492957746478874
+      "utterances_with_missed_evidence_pct": 12.67605633802817
     },
     {
       "group": "hinglish",
@@ -287,15 +287,15 @@
       "group": "M_temporal_reassertion",
       "rows": 4,
       "precision": 1.0,
-      "recall": 0.42857142857142855,
-      "f1": 0.6,
-      "true_positive_count": 3,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive_count": 7,
       "false_positive_count": 0,
-      "false_negative_count": 4,
-      "exact_set_match_rate": 0.5,
+      "false_negative_count": 0,
+      "exact_set_match_rate": 1.0,
       "average_false_positive_count": 0.0,
       "utterances_with_false_positive_pct": 0.0,
-      "utterances_with_missed_evidence_pct": 50.0
+      "utterances_with_missed_evidence_pct": 0.0
     },
     {
       "group": "N_pseudo_negation",
@@ -459,10 +459,8 @@
     "code-switching failure": 4,
     "nested alias false positive": 3,
     "negation-scope error": 2,
-    "temporal reasoning error": 2,
     "ambiguity": 2,
     "negation trigger gap": 1,
-    "red-flag detection failure": 1,
     "categorical mapping error": 1
   }
 }

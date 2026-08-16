@@ -8,7 +8,13 @@ the refactor (see docs/CHANGELOG_REFACTOR.md).
 import pytest
 
 from utils.ddxplus_decoder import infer_evidence_codes_from_text
-from utils.negation import filter_negated, find_phrase_span, is_negated
+from utils.negation import (
+    filter_negated,
+    find_phrase_span,
+    is_negated,
+    temporal_reassertion,
+    temporal_resolution,
+)
 
 
 @pytest.mark.parametrize(
@@ -102,3 +108,42 @@ def test_inability_contractions_are_not_absence_claims():
         span = find_phrase_span(text, "breathe") or find_phrase_span(text, "walk")
         assert span is not None
         assert is_negated(text, span[0], span[1]) is False
+
+
+@pytest.mark.parametrize(
+    "text,phrase",
+    [
+        ("I had no chest pain yesterday but today it started", "chest pain"),
+        ("I didn't have fever yesterday but now I do", "fever"),
+        ("There was no cough earlier but I have cough now", "cough"),
+        ("I had no headache earlier but it started this evening", "headache"),
+        ("The pain was gone yesterday but it came back today", "pain"),
+    ],
+)
+def test_temporal_reassertion_overrides_historical_negation(text, phrase):
+    span = find_phrase_span(text, phrase)
+    assert span is not None
+    assert temporal_reassertion(text, phrase) is True
+    assert is_negated(text, span[0], span[1]) is False
+
+
+def test_historical_negative_without_reassertion_stays_negated():
+    text = "I had no fever yesterday"
+    span = find_phrase_span(text, "fever")
+    assert span is not None
+    assert temporal_reassertion(text, "fever") is False
+    assert is_negated(text, span[0], span[1]) is True
+
+
+@pytest.mark.parametrize(
+    "text,phrase",
+    [
+        ("I had fever yesterday but I don't have it now", "fever"),
+        ("The cough started yesterday but it has resolved", "cough"),
+    ],
+)
+def test_temporal_resolution_overrides_historical_positive(text, phrase):
+    span = find_phrase_span(text, phrase)
+    assert span is not None
+    assert temporal_resolution(text, phrase) is True
+    assert is_negated(text, span[0], span[1]) is True

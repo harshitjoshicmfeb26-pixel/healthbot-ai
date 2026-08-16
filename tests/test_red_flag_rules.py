@@ -42,3 +42,18 @@ def test_contraction_negation_does_not_suppress_inability_phrase():
     # There is no direct "breathe" alias in the current metadata/rule list;
     # importantly, contraction negation must not create a denied red flag.
     assert all("breath" not in flag for flag in result["denied_flags"])
+
+
+def test_temporal_chest_pain_reassertion_triggers_red_flag():
+    result = detect_red_flags(
+        "I had no chest pain yesterday but today it started and I am short of breath"
+    )
+    assert result["has_red_flag"] is True
+    assert "chest pain" in result["matched_flags"]
+    assert "shortness of breath" in result["matched_flags"]
+
+
+def test_resolved_historical_chest_pain_does_not_trigger_red_flag():
+    result = detect_red_flags("I had chest pain yesterday but I don't have it now")
+    assert result["has_red_flag"] is False
+    assert "chest pain" in result["denied_flags"]

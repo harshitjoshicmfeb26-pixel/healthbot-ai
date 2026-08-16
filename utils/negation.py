@@ -99,6 +99,34 @@ TERMINATION_TOKENS: tuple[str, ...] = (
     "par", "lekin", "पण",
 )
 
+# These markers are intentionally narrow.  They support an explicit later
+# assertion or resolution in the immediately following clause, rather than
+# attempting unrestricted temporal/coreference reasoning.
+_TEMPORAL_REASSERTION_RE = re.compile(
+    r"\b(?:but|however)\b.*?"
+    r"(?:\b(?:started|began|returned|came back|is back)\b|"
+    r"\b(?:now|today|currently|later|this morning|this evening)\b.*?"
+    r"\b(?:i have|i do|it started|it began|it returned|it came back)\b|"
+    r"\b(?:i have|i do)\b.*?\b(?:now|today|currently|later|this morning|this evening)\b)",
+    re.IGNORECASE,
+)
+_TEMPORAL_RETURN_RE = re.compile(
+    r"\b(?:returned|came back|is back)\b.*?"
+    r"\b(?:now|today|currently|later|this morning|this evening)\b",
+    re.IGNORECASE,
+)
+_TEMPORAL_RESOLUTION_RE = re.compile(
+    r"\b(?:but|however)\b.*?"
+    r"(?:\b(?:don t have|doesn t have|didn t have|haven t|hasn t|"
+    r"isn t|aren t|wasn t|weren t)\b.*?\b(?:now|currently|today)\b|"
+    r"\b(?:gone|resolved|ended|stopped|no longer)\b)",
+    re.IGNORECASE,
+)
+_RESOLVED_RE = re.compile(
+    r"\b(?:has|have|is|was)\s+resolved\b|\b(?:gone|resolved|ended|stopped)\b",
+    re.IGNORECASE,
+)
+
 # Maximum number of words a pre-trigger's scope extends over before it is
 # considered to have run out (mirrors NegEx's default ~5-7 token window).
 DEFAULT_SCOPE_WORDS = 6
@@ -109,6 +137,44 @@ _WORD_RE = re.compile(r"\S+")
 def _normalize_apostrophes(text: str) -> str:
     """Normalize common Unicode apostrophes without changing text length."""
     return text.replace("\u2018", "'").replace("\u2019", "'").replace("\u02bc", "'")
+
+
+def _temporal_text(text: str) -> str:
+    """Normalize only punctuation needed by the narrow temporal rules."""
+    normalized = _normalize_apostrophes(str(text or "")).lower().replace("'", " ")
+    return re.sub(r"[^a-z0-9\u0900-\u097f ]+", " ", normalized)
+
+
+def temporal_reassertion(text: str, phrase: str) -> bool:
+    """Return whether *phrase* is explicitly reasserted in a later clause."""
+    raw = _temporal_text(text)
+    target = _temporal_text(phrase).strip()
+    if not raw or not target:
+        return False
+    first = re.search(r"(?<!\S)" + re.escape(target) + r"(?!\S)", raw)
+    if first is None:
+        return False
+    suffix = raw[first.end():]
+    return bool(_TEMPORAL_REASSERTION_RE.search(suffix) or _TEMPORAL_RETURN_RE.search(suffix))
+
+
+def temporal_resolution(text: str, phrase: str) -> bool:
+    """Return whether *phrase* is explicitly resolved in a later clause."""
+    raw = _temporal_text(text)
+    target = _temporal_text(phrase).strip()
+    if not raw or not target:
+        return False
+    first = re.search(r"(?<!\S)" + re.escape(target) + r"(?!\S)", raw)
+    if first is None:
+        return False
+    prefix = raw[max(0, first.start() - 32):first.start()]
+    if re.search(r"no longer\s+(?:has|have)\s*$", prefix, re.IGNORECASE):
+        return True
+    suffix = raw[first.end():]
+    if _TEMPORAL_RESOLUTION_RE.search(suffix):
+        return True
+    clause = re.split(r"\b(?:but|however)\b", suffix, maxsplit=1, flags=re.IGNORECASE)
+    return len(clause) == 2 and bool(_RESOLVED_RE.search(clause[1]))
 
 
 @dataclass(frozen=True)
@@ -214,6 +280,11 @@ def negated_ranges(text: str, scope_words: int = DEFAULT_SCOPE_WORDS) -> list[Ne
 
 def is_negated(text: str, phrase_start: int, phrase_end: int, scope_words: int = DEFAULT_SCOPE_WORDS) -> bool:
     """Is the span [phrase_start, phrase_end) inside a negated scope?"""
+    phrase = str(text or "")[phrase_start:phrase_end]
+    if temporal_resolution(text, phrase):
+        return True
+    if temporal_reassertion(text, phrase):
+        return False
     for span in negated_ranges(text, scope_words):
         if max(phrase_start, span.start) < min(phrase_end, span.end):
             return True
