@@ -21,8 +21,8 @@ def _latin_phrase_pattern(phrase: str) -> re.Pattern:
     return re.compile(r"(?<![a-zA-Z])" + re.escape(phrase) + r"(?![a-zA-Z])", re.IGNORECASE)
 
 
-def _find_phrase_matches(text: str) -> List[Tuple[str, str]]:
-    """Return longest phrase matches as (source_phrase, canonical_symptom)."""
+def _find_phrase_matches(text: str) -> List[Tuple[int, int, str, str]]:
+    """Return longest phrase matches with source spans and canonical terms."""
     phrase_map = merged_symptom_map()
     matches: List[Tuple[int, int, str, str]] = []
     occupied: list[tuple[int, int]] = []
@@ -46,7 +46,27 @@ def _find_phrase_matches(text: str) -> List[Tuple[str, str]]:
                     matches.append((span[0], span[1], match.group(0), canonical))
                     occupied.append(span)
 
-    return [(source, canonical) for _, _, source, canonical in sorted(matches, key=lambda item: item[0])]
+    return sorted(matches, key=lambda item: item[0])
+
+
+def deterministic_exact_matches(text: str) -> List[Dict]:
+    """Return only manually defined exact normalizations with provenance.
+
+    This intentionally excludes fuzzy matching and optional NLU output.  The
+    source span lets downstream evidence resolution apply polarity to the
+    original utterance instead of to a flattened canonical string.
+    """
+    return [
+        {
+            "source": source,
+            "canonical": canonical,
+            "match_type": "exact",
+            "score": 1.0,
+            "start": start,
+            "end": end,
+        }
+        for start, end, source, canonical in _find_phrase_matches(text or "")
+    ]
 
 
 def _unique_preserve_order(values: List[str]) -> List[str]:
@@ -93,19 +113,11 @@ def normalize_symptoms(text: str) -> Dict:
     """
     original_text = text or ""
     detected = detect_language(original_text)
-    matches = _find_phrase_matches(original_text)
-
-    mapped_symptoms = [
-        {
-            "source": source,
-            "canonical": canonical,
-            "match_type": "exact",
-            "score": 1.0,
-        }
-        for source, canonical in matches
-    ]
-    canonical_terms = _unique_preserve_order([canonical for _, canonical in matches])
-    mapped_sources = [source for source, _ in matches]
+    mapped_symptoms = deterministic_exact_matches(original_text)
+    canonical_terms = _unique_preserve_order(
+        [item["canonical"] for item in mapped_symptoms]
+    )
+    mapped_sources = [item["source"] for item in mapped_symptoms]
 
     fuzzy_matches = fuzzy_match_symptoms(
         original_text,

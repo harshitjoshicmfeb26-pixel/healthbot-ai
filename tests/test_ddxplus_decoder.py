@@ -8,6 +8,8 @@ real enough in structure to exercise decode_evidence / decode_condition /
 condition_severity / infer_evidence_codes_from_text meaningfully.
 """
 
+import pytest
+
 from utils.ddxplus_decoder import (
     condition_severity,
     decode_condition,
@@ -104,3 +106,37 @@ def test_hinglish_headache_sore_throat_fever_aliases():
 def test_select_initial_evidence_prefers_specific_code_over_generic_pain():
     matches = infer_evidence_codes_from_text("burning urination with lower back pain")
     assert select_initial_evidence(matches) == "E_55_@_V_185"
+
+
+@pytest.mark.parametrize(
+    "text,expected_codes",
+    [
+        ("mala taap ani khokla aahe", {"E_91", "E_201"}),
+        ("mala taap aahe", {"E_91"}),
+        ("mujhe bukhar aur khansi hai", {"E_91", "E_201"}),
+        ("मला ताप आणि खोकला आहे", {"E_91", "E_201"}),
+        ("I have fever and cough", {"E_91", "E_201"}),
+    ],
+)
+def test_deterministic_canonical_normalization_bridges_to_ddx_codes(text, expected_codes):
+    matches = infer_evidence_codes_from_text(text)
+    codes = {item["code"] for item in matches}
+    assert expected_codes <= codes
+    assert len(codes) == len(matches)
+
+
+def test_canonical_bridge_preserves_original_negation():
+    matches = infer_evidence_codes_from_text("mala taap nahi", include_denied=True)
+    assert "E_91" not in {item["code"] for item in matches if not item["negated"]}
+    assert "E_91" in {item["code"] for item in matches if item["negated"]}
+
+
+def test_canonical_bridge_preserves_structured_chest_pain_codes():
+    matches = infer_evidence_codes_from_text("chest pain")
+    assert {item["code"] for item in matches} >= {"E_53", "E_55_@_V_29"}
+
+
+def test_canonical_bridge_does_not_create_new_nested_context_codes():
+    before = infer_evidence_codes_from_text("family asthma")
+    after_codes = {item["code"] for item in before}
+    assert "E_87" in after_codes

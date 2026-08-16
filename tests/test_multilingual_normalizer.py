@@ -27,3 +27,15 @@ def test_normalizer_can_use_ollama_nlu_fallback(monkeypatch):
     assert result["llm_extraction"]["slots"]["age"] == 35
     assert {item["canonical"] for item in result["mapped_symptoms"]} == {"fever", "cough"}
     assert {item["match_type"] for item in result["mapped_symptoms"]} == {"ollama_nlu"}
+
+
+def test_exact_normalization_exposes_source_spans_without_fuzzy_matches():
+    matches = multilingual_normalizer.deterministic_exact_matches(
+        "mala taap ani khokla aahe"
+    )
+    assert [(item["source"], item["canonical"]) for item in matches] == [
+        ("taap", "fever"),
+        ("khokla", "cough"),
+    ]
+    assert all(item["match_type"] == "exact" for item in matches)
+    assert all(isinstance(item["start"], int) for item in matches)

@@ -624,6 +624,51 @@ def _evidence_strength(alias: str, codes: list[str]) -> str:
     return "metadata_alias"
 
 
+def _deterministic_normalization_bridge(
+    text: str,
+    alias_map: dict[str, list[str]],
+    seen: set[str],
+    seen_denied: set[str],
+) -> tuple[list[dict], list[dict]]:
+    """Resolve exact canonical normalizations without losing source polarity."""
+    try:
+        from utils.multilingual_normalizer import deterministic_exact_matches
+    except Exception:
+        return [], []
+
+    additions: list[dict] = []
+    denied_additions: list[dict] = []
+    for item in deterministic_exact_matches(text):
+        canonical = _normalize_text(item.get("canonical", "")).strip()
+        codes = alias_map.get(canonical, [])
+        if not canonical or not codes:
+            continue
+        start, end = item.get("start"), item.get("end")
+        if not isinstance(start, int) or not isinstance(end, int):
+            continue
+        negated = is_negated(text, start, end)
+        strength = _evidence_strength(canonical, codes)
+        for code in codes:
+            if code in seen or code in seen_denied:
+                continue
+            decoded = decode_evidence(code)
+            result = {
+                "source_text": item.get("source", canonical),
+                "code": code,
+                "meaning": decoded["meaning"],
+                "match_type": "deterministic_canonical_bridge",
+                "evidence_strength": strength,
+                "negated": negated,
+            }
+            if negated:
+                seen_denied.add(code)
+                denied_additions.append(result)
+            else:
+                seen.add(code)
+                additions.append(result)
+    return additions, denied_additions
+
+
 def _is_generic_initial_code(code: str) -> bool:
     base, value = split_evidence_code(code)
     return base in GENERIC_INITIAL_EVIDENCE_CODES and not value
@@ -745,6 +790,12 @@ def infer_evidence_codes_from_text(text: str, include_denied: bool = False) -> l
                 "evidence_strength": strength,
                 "negated": False,
             })
+
+    bridge_matches, bridge_denied = _deterministic_normalization_bridge(
+        text, alias_map, seen, seen_denied
+    )
+    matches.extend(bridge_matches)
+    denied_matches.extend(bridge_denied)
 
     def _finish(extra_matches: list[dict] | None = None) -> list[dict]:
         result = matches + (extra_matches or [])

@@ -4,18 +4,10 @@ C01,C_typo,english,coughh and fevr,english,coughh and fevr,,,E_201; E_91,,E_201,
 C02,C_typo,english,headeche,english,headeche,,,E_53; E_55_@_V_11,,E_55_@_V_11,,False,False,,typo failure,misspelled headache
 C03,C_typo,english,nausous,english,nausous,,,E_148,,E_148,,False,False,,typo failure,misspelled nausea
 C04,C_typo,english,wheezng,english,wheezng,,,E_214,,E_214,,False,False,,typo failure,misspelled wheezing
-E02,E_hinglish,hinglish,pet dard aur ulti,hinglish,abdominal pain vomiting,E_53; E_55_@_V_187,,E_211; E_53; E_55_@_V_187,,E_55_@_V_187,E_55_@_V_187,False,False,,lexical coverage gap,Hinglish abdominal symptoms
-E03,E_hinglish,hinglish,peshab me jalan,hinglish,burning urination,,,E_53; E_55_@_V_185,,E_55_@_V_185,,False,False,,lexical coverage gap,Hinglish urinary symptom without configured retention phrase
-F02,F_marathi_devanagari,marathi_devanagari,मला पोटदुखी आहे,marathi_devanagari,abdominal pain,,,E_53; E_55_@_V_187,,E_55_@_V_187,,False,False,,lexical coverage gap,Marathi abdominal pain
-G01,G_romanized_marathi,romanized_marathi,mala taap ani khokla aahe,romanized_marathi,fever cough,E_201,,E_201; E_91,,E_91,E_201,False,False,,normalization-to-evidence gap; code-switching failure,known Romanized Marathi gap
-G02,G_romanized_marathi,romanized_marathi,pot dukhane,romanized_marathi,abdominal pain,,,E_53; E_55_@_V_187,,E_55_@_V_187,,False,False,,normalization-to-evidence gap; code-switching failure,Romanized Marathi abdominal pain
-G03,G_romanized_marathi,romanized_marathi,khokla ani taap,romanized_marathi,cough fever,E_201,,E_201; E_91,,E_201,E_201,False,False,,normalization-to-evidence gap; code-switching failure,Romanized Marathi ordering variant
-G04,G_romanized_marathi,romanized_marathi,laghvila jaljal,romanized_marathi,burning urination,,,E_53; E_55_@_V_185,,E_55_@_V_185,,False,False,,normalization-to-evidence gap; code-switching failure,Romanized Marathi urinary symptom without configured retention phrase
 J02,J_contraction_negation,english,I can't breathe,english,I can't breathe,,,,E_66,,,False,False,,negation trigger gap,contraction and safety edge
 K02,K_multiple_negated,english,I deny fever and cough,english,fever cough,E_201; E_91,,,E_201; E_91,,E_201,False,False,,negation-scope error; lexical coverage gap,shared trigger
 L02,L_mixed_polarity,english,I deny chest pain but have shortness of breath,english,chest pain shortness of breath,E_53; E_55_@_V_29; E_66,,E_66,E_53; E_55_@_V_29,E_66,E_55_@_V_29,True,True,chest pain; shortness of breath,negation-scope error; lexical coverage gap,mixed safety case
 N02,N_pseudo_negation,english,Cough cannot be ruled out,english,cough,,E_201,E_201,,E_201,,False,False,,lexical coverage gap,pseudo-negation
-O03,O_multiple_positive,hinglish,"bukhar, dast aur ulti",hinglish,fever diarrhea vomiting,E_91,,E_211; E_51; E_91,,E_91,E_91,False,False,,lexical coverage gap,multiple Hinglish symptoms
 P03,P_pain_location,english,pain in the groin,english,pain in the groin,E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,lexical coverage gap,laterality intentionally unresolved
 Q04,Q_pain_intensity,english,severe chest pain,english,chest pain,E_53; E_55_@_V_29,,E_53; E_55_@_V_29; E_56_@_8,,E_55_@_V_29,E_55_@_V_29,True,True,severe chest pain; chest pain,categorical mapping error,known intensity/location interaction
 S04,S_previous_history,english,I have had pneumonia before,english,I have had pneumonia before,,,E_118,,E_118,,False,False,,lexical coverage gap,antecedent history

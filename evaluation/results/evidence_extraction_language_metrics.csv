@@ -1,6 +1,6 @@
 average_false_positive_count,exact_set_match_rate,f1,false_negative_count,false_positive_count,group,precision,recall,rows,true_positive_count,utterances_with_false_positive_pct,utterances_with_missed_evidence_pct
 0.18309859154929578,0.7746478873239436,0.8518518518518519,11,13,english,0.8414634146341463,0.8625,71,69,12.67605633802817,12.67605633802817
-0.0,0.6666666666666666,0.761904761904762,5,0,hinglish,1.0,0.6153846153846154,9,8,0.0,33.333333333333336
-0.0,0.8571428571428571,0.9,2,0,marathi_devanagari,1.0,0.8181818181818182,7,9,0.0,14.285714285714286
+0.0,1.0,1.0,0,0,hinglish,1.0,1.0,9,13,0.0,0.0
+0.0,1.0,1.0,0,0,marathi_devanagari,1.0,1.0,7,11,0.0,0.0
 0.0,1.0,1.0,0,0,mixed,1.0,1.0,5,9,0.0,0.0
-0.0,0.0,0.4,6,0,romanized_marathi,1.0,0.25,4,2,0.0,100.0
+0.0,1.0,1.0,0,0,romanized_marathi,1.0,1.0,4,8,0.0,0.0
