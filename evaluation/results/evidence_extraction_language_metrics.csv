@@ -1,5 +1,5 @@
 average_false_positive_count,exact_set_match_rate,f1,false_negative_count,false_positive_count,group,precision,recall,rows,true_positive_count,utterances_with_false_positive_pct,utterances_with_missed_evidence_pct
-0.18309859154929578,0.7746478873239436,0.8518518518518519,11,13,english,0.8414634146341463,0.8625,71,69,12.67605633802817,12.67605633802817
+0.14084507042253522,0.8169014084507042,0.875,10,10,english,0.875,0.875,71,70,8.450704225352112,11.267605633802816
 0.0,1.0,1.0,0,0,hinglish,1.0,1.0,9,13,0.0,0.0
 0.0,1.0,1.0,0,0,marathi_devanagari,1.0,1.0,7,11,0.0,0.0
 0.0,1.0,1.0,0,0,mixed,1.0,1.0,5,9,0.0,0.0

@@ -140,3 +140,28 @@ def test_canonical_bridge_does_not_create_new_nested_context_codes():
     before = infer_evidence_codes_from_text("family asthma")
     after_codes = {item["code"] for item in before}
     assert "E_87" in after_codes
+
+
+@pytest.mark.parametrize(
+    "text,expected_codes,forbidden_codes",
+    [
+        ("family asthma", {"E_87"}, {"E_124"}),
+        ("family asthma and cough", {"E_87", "E_201"}, {"E_124"}),
+        ("I have asthma and my mother has asthma", {"E_124", "E_142"}, set()),
+        ("previous diabetes", {"E_69"}, set()),
+        ("family asthma and diabetes history", {"E_87", "E_69"}, {"E_124"}),
+        ("no family history of asthma", set(), {"E_87", "E_124"}),
+        ("my family has asthma but I don't", {"E_87"}, {"E_124"}),
+    ],
+)
+def test_contextual_alias_precedence(text, expected_codes, forbidden_codes):
+    matches = infer_evidence_codes_from_text(text, include_denied=True)
+    positive = {item["code"] for item in matches if not item["negated"]}
+    assert expected_codes <= positive
+    assert forbidden_codes.isdisjoint(positive)
+
+
+def test_chest_pain_multi_code_mapping_is_preserved_under_precedence():
+    for text in ("chest pain", "severe chest pain"):
+        codes = {item["code"] for item in infer_evidence_codes_from_text(text)}
+        assert {"E_53", "E_55_@_V_29"} <= codes

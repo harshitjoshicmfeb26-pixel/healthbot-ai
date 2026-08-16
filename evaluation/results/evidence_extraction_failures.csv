@@ -11,8 +11,5 @@ N02,N_pseudo_negation,english,Cough cannot be ruled out,english,cough,,E_201,E_2
 P03,P_pain_location,english,pain in the groin,english,pain in the groin,E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,lexical coverage gap,laterality intentionally unresolved
 Q04,Q_pain_intensity,english,severe chest pain,english,chest pain,E_53; E_55_@_V_29,,E_53; E_55_@_V_29; E_56_@_8,,E_55_@_V_29,E_55_@_V_29,True,True,severe chest pain; chest pain,categorical mapping error,known intensity/location interaction
 S04,S_previous_history,english,I have had pneumonia before,english,I have had pneumonia before,,,E_118,,E_118,,False,False,,lexical coverage gap,antecedent history
-T01,T_family_history,english,family asthma,english,family asthma,E_124; E_87,,E_87,,E_87,E_124,False,False,,nested alias false positive,family history
-T04,T_family_history,english,my mother has asthma,english,my mother has asthma,E_124,,E_142,,E_142,E_124,False,False,,lexical coverage gap; nested alias false positive,family history
-U01,U_nested_alias,english,family asthma and diabetes history,english,family asthma and diabetes history,E_124; E_69; E_87,,E_69; E_87,,E_87,E_124,False,False,,nested alias false positive,known nested asthma alias issue
 X02,X_ambiguous,english,pain somewhere,english,pain somewhere,E_55,,,,,E_55,False,False,,ambiguity,generic pain without location
 X03,X_ambiguous,english,groin pain,english,groin pain,E_53; E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,ambiguity,laterality unresolved

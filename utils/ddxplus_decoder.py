@@ -261,6 +261,10 @@ CURATED_TEXT_ALIASES = {
     "family cardiac disease": ["E_225"],
     "family cardiovascular disease": ["E_225"],
     "family asthma": ["E_87"],
+    "family history of asthma": ["E_87"],
+    "my family has asthma": ["E_87"],
+    "my mother has asthma": ["E_142"],
+    "mother has asthma": ["E_142"],
     "family allergy": ["E_86"],
 }
 
@@ -535,6 +539,12 @@ def _locate_alias(normalized_text: str, alias: str) -> tuple[int, int] | None:
     return match.span() if match else None
 
 
+def _locate_aliases(normalized_text: str, alias: str) -> list[tuple[int, int]]:
+    """Find every whole-phrase occurrence of an alias."""
+    pattern = r"(?<!\S)" + re.escape(alias) + r"(?!\S)"
+    return [match.span() for match in re.finditer(pattern, normalized_text)]
+
+
 def _should_try_semantic_fallback(text: str) -> bool:
     normalized = _normalize_text(text)
     tokens = set(normalized.split())
@@ -752,44 +762,50 @@ def infer_evidence_codes_from_text(text: str, include_denied: bool = False) -> l
     denied_matches = []
     seen = set()
     seen_denied = set()
+    accepted_spans: list[tuple[int, int]] = []
     alias_map = alias_to_evidence_map()
     for alias, codes in sorted(alias_map.items(), key=lambda item: len(item[0]), reverse=True):
         if not alias:
             continue
-        span = _locate_alias(normalized, alias)
-        if span is None:
-            continue
-        if _is_location_only_match(alias, codes) and not _has_local_pain_context(normalized, span):
-            continue
-        negated = is_negated(normalized, span[0], span[1])
-        strength = _evidence_strength(alias, codes)
-        for code in codes:
-            if negated:
-                if code in seen or code in seen_denied:
+        for span in _locate_aliases(normalized, alias):
+            # Aliases are processed longest-first.  Once a longer contextual
+            # phrase occupies a span, shorter nested aliases are suppressed;
+            # codes belonging to the accepted phrase itself remain intact.
+            if any(max(span[0], old_start) < min(span[1], old_end)
+                   for old_start, old_end in accepted_spans):
+                continue
+            if _is_location_only_match(alias, codes) and not _has_local_pain_context(normalized, span):
+                continue
+            accepted_spans.append(span)
+            negated = is_negated(normalized, span[0], span[1])
+            strength = _evidence_strength(alias, codes)
+            for code in codes:
+                if negated:
+                    if code in seen or code in seen_denied:
+                        continue
+                    seen_denied.add(code)
+                    decoded = decode_evidence(code)
+                    denied_matches.append({
+                        "source_text": alias,
+                        "code": code,
+                        "meaning": decoded["meaning"],
+                        "match_type": "exact_alias",
+                        "evidence_strength": strength,
+                        "negated": True,
+                    })
                     continue
-                seen_denied.add(code)
+                if code in seen:
+                    continue
+                seen.add(code)
                 decoded = decode_evidence(code)
-                denied_matches.append({
+                matches.append({
                     "source_text": alias,
                     "code": code,
                     "meaning": decoded["meaning"],
                     "match_type": "exact_alias",
                     "evidence_strength": strength,
-                    "negated": True,
+                    "negated": False,
                 })
-                continue
-            if code in seen:
-                continue
-            seen.add(code)
-            decoded = decode_evidence(code)
-            matches.append({
-                "source_text": alias,
-                "code": code,
-                "meaning": decoded["meaning"],
-                "match_type": "exact_alias",
-                "evidence_strength": strength,
-                "negated": False,
-            })
 
     bridge_matches, bridge_denied = _deterministic_normalization_bridge(
         text, alias_map, seen, seen_denied
