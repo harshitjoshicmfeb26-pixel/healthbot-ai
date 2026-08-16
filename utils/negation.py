@@ -49,6 +49,27 @@ PRE_NEGATION_TRIGGERS: tuple[str, ...] = (
     "no longer has", "absence of", "free of", "negative for",
     "denies having", "denies", "denied", "without any", "without",
     "not experiencing", "not having", "not feeling", "not", "no",
+    # Explicit experiencer/possession contractions.  These are deliberately
+    # phrase-scoped rather than a blanket ``n't`` rule: "can't breathe" and
+    # "couldn't walk" describe an inability, not absence of the symptom.
+    "doesn't have", "didn't have", "don't have",
+    "hasn't had", "hadn't had", "haven't had",
+    "wasn't experiencing", "weren't experiencing",
+    "isn't experiencing", "aren't experiencing",
+    "isn't", "aren't", "wasn't", "weren't",
+    "doesn't feel", "didn't feel", "don't feel",
+    "hasn't experienced", "hadn't experienced", "haven't experienced",
+    "wasn't feeling", "weren't feeling", "isn't feeling", "aren't feeling",
+    # The DDXPlus text normalizer strips apostrophes, so retain equivalent
+    # tokenized forms ("don't" -> "don t") for callers using normalized text.
+    "doesn t have", "didn t have", "don t have",
+    "hasn t had", "hadn t had", "haven t had",
+    "wasn t experiencing", "weren t experiencing",
+    "isn t experiencing", "aren t experiencing",
+    "isn t", "aren t", "wasn t", "weren t",
+    "doesn t feel", "didn t feel", "don t feel",
+    "hasn t experienced", "hadn t experienced", "haven t experienced",
+    "wasn t feeling", "weren t feeling", "isn t feeling", "aren t feeling",
 )
 
 POST_NEGATION_TRIGGERS: tuple[str, ...] = (
@@ -83,6 +104,11 @@ TERMINATION_TOKENS: tuple[str, ...] = (
 DEFAULT_SCOPE_WORDS = 6
 
 _WORD_RE = re.compile(r"\S+")
+
+
+def _normalize_apostrophes(text: str) -> str:
+    """Normalize common Unicode apostrophes without changing text length."""
+    return text.replace("\u2018", "'").replace("\u2019", "'").replace("\u02bc", "'")
 
 
 @dataclass(frozen=True)
@@ -163,7 +189,7 @@ def negated_ranges(text: str, scope_words: int = DEFAULT_SCOPE_WORDS) -> list[Ne
     Both pre-triggers ("no fever") and post-triggers ("fever was ruled out")
     are handled. Pseudo-negations ("not ruled out") are skipped.
     """
-    raw_text = str(text or "")
+    raw_text = _normalize_apostrophes(str(text or ""))
     if not raw_text.strip():
         return []
 

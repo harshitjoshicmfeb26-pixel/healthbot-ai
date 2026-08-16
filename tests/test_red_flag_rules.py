@@ -34,3 +34,11 @@ def test_mixed_affirmed_and_negated_only_flags_affirmed():
     assert result["has_red_flag"] is True
     assert "shortness of breath" in result["denied_flags"]
     assert any("chest pain" in flag for flag in result["matched_flags"])
+
+
+def test_contraction_negation_does_not_suppress_inability_phrase():
+    result = detect_red_flags("I don't have chest pain but I can't breathe")
+    assert "chest pain" in result["denied_flags"]
+    # There is no direct "breathe" alias in the current metadata/rule list;
+    # importantly, contraction negation must not create a denied red flag.
+    assert all("breath" not in flag for flag in result["denied_flags"])

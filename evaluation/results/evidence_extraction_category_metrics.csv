@@ -8,7 +8,7 @@ average_false_positive_count,exact_set_match_rate,f1,false_negative_count,false_
 0.0,0.0,0.4,6,0,G_romanized_marathi,1.0,0.25,4,2,0.0,100.0
 0.0,1.0,1.0,0,0,H_mixed_language,1.0,1.0,4,9,0.0,0.0
 0.0,1.0,0.0,0,0,I_simple_negation,0.0,0.0,4,0,0.0,0.0
-1.0,0.25,0.0,0,4,J_contraction_negation,0.0,0.0,4,0,75.0,0.0
+0.0,1.0,0.0,0,0,J_contraction_negation,0.0,0.0,4,0,0.0,0.0
 0.5,0.75,0.0,0,2,K_multiple_negated,0.0,0.0,4,0,25.0,0.0
 0.5,0.75,0.8,0,2,L_mixed_polarity,0.6666666666666666,1.0,4,4,25.0,0.0
 0.0,0.5,0.6,4,0,M_temporal_reassertion,1.0,0.42857142857142855,4,3,0.0,50.0
