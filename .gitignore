@@ -28,6 +28,9 @@ saved_models/*.pkl
 saved_models/*.bin
 saved_models/*.pt
 saved_models/*.h5
+!saved_models/disease_classifier.pkl
+!saved_models/tfidf_vectorizer.pkl
+!saved_models/label_encoder.pkl
 .hf_cache/
 
 # ── Data (raw CSVs — check policy before committing) ─────────
