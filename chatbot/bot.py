@@ -23,7 +23,6 @@ import re
 from typing import Dict, List, Tuple
 
 from config import CONFIDENCE_THRESHOLD, MAX_CLARIFICATION_TURNS, RED_FLAG_FIRST
-from model.predict_disease import disease_classifier_available, predict_disease
 from model.predictor import explain_case, predict, predict_case, semantic_search, semantic_search_case
 from utils.ddxplus_decoder import infer_evidence_codes_from_text, parse_age_sex_from_text, select_initial_evidence
 from utils.multilingual_normalizer import normalize_symptoms
@@ -413,70 +412,25 @@ def assess_symptoms(
             search_results = []
             mode = "model_scope_limited"
         else:
-            classifier_note = ""
-            if case_details and disease_classifier_available():
-                try:
-                    evidence_text = "; ".join(
-                        item.get("meaning", "") for item in inferred if item.get("meaning")
-                    )
-                    classifier_symptoms = "; ".join(
-                        item for item in [case_details.get("symptoms_text", symptoms_text), evidence_text] if item
-                    )
-                    predictions = predict_disease(
-                        age=case_details.get("age", age),
-                        gender=case_details.get("gender", sex),
-                        symptoms_text=classifier_symptoms,
-                        duration=case_details.get("duration", "unknown"),
-                        severity=case_details.get("severity", "unknown"),
-                        pain_location=case_details.get("pain_location", "unknown"),
-                        previous_disease_or_history=case_details.get("previous_disease_or_history", "unknown"),
-                        genetic_or_family_history=case_details.get("genetic_or_family_history", "unknown"),
-                        top_n=top_n,
-                    )
-                    search_results = []
-                    mode = "supervised_disease_classifier"
-                except Exception as exc:
-                    classifier_note = (
-                        "Simplified disease classifier was available but failed, "
-                        f"so structured evidence model was used instead: {exc}"
-                    )
-                    predictions = predict_case(
-                        age=age,
-                        sex=sex,
-                        evidences=codes,
-                        initial_evidence=initial,
-                        top_n=top_n,
-                    )
-                    search_results = semantic_search_case(
-                        age=age,
-                        sex=sex,
-                        evidences=codes,
-                        initial_evidence=initial,
-                        top_k=3,
-                    )
-                    mode = "human_symptoms_to_structured_evidence"
-            else:
-                if case_details:
-                    classifier_note = (
-                        "Simplified disease classifier artifact was not found, "
-                        "so structured evidence model was used instead. Run "
-                        "`python -m model.train_disease_classifier` to enable it."
-                    )
-                predictions = predict_case(
-                    age=age,
-                    sex=sex,
-                    evidences=codes,
-                    initial_evidence=initial,
-                    top_n=top_n,
-                )
-                search_results = semantic_search_case(
-                    age=age,
-                    sex=sex,
-                    evidences=codes,
-                    initial_evidence=initial,
-                    top_k=3,
-                )
-                mode = "human_symptoms_to_structured_evidence"
+            # The structured DDXPlus engine is the single canonical disease
+            # predictor. Conversation slots remain in the assessment context
+            # for safety, triage, response wording, and future questioning;
+            # their presence must not switch prediction models.
+            predictions = predict_case(
+                age=age,
+                sex=sex,
+                evidences=codes,
+                initial_evidence=initial,
+                top_n=top_n,
+            )
+            search_results = semantic_search_case(
+                age=age,
+                sex=sex,
+                evidences=codes,
+                initial_evidence=initial,
+                top_k=3,
+            )
+            mode = "human_symptoms_to_structured_evidence"
 
         evidence_bridge = {
             "mode": mode,
@@ -488,7 +442,7 @@ def assess_symptoms(
             "evidence_quality": quality,
             "scope_warning": scope,
             "case_details": case_details or {},
-            "classifier_note": classifier_note if "classifier_note" in locals() else "",
+            "classifier_note": "",
             "biobert": biobert_status(),
         }
     else:
