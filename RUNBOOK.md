@@ -5,11 +5,19 @@ Step-by-step instructions to run, test, and (optionally) retrain HealthBot.
 ## 1. Set up the environment
 
 ```bash
-cd healthcare_nlp_assistant
-python3 -m venv venv
-source venv/bin/activate          # Windows (PowerShell): venv\Scripts\Activate.ps1
+cd healthbot-ai
+python -m venv .venv
+source .venv/bin/activate          # Windows (PowerShell): .venv\Scripts\Activate.ps1
 pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+Install Git LFS before cloning or pulling so the core model files are
+materialized:
+
+```bash
+git lfs install
+git lfs pull
 ```
 
 No `.env` file is required — every setting in `config.py` has a safe
@@ -19,7 +27,7 @@ something (a different port, enabling Ollama, etc.).
 ## 2. Run the app
 
 ```bash
-python3 server.py
+python server.py                 # Windows: .venv\Scripts\python.exe server.py
 ```
 
 You should see:
@@ -48,9 +56,9 @@ pip install -r requirements-dev.txt
 python3 -m pytest tests/ -v
 ```
 
-60+ tests cover every `utils/` module, the explainability function, the
-session store, and the Flask API (via Flask's test client — no live server
-needed for the tests).
+The current verified release checkpoint contains 170 passing tests covering
+the NLP utilities, explainability, session store, and Flask API. The count is
+a checkpoint and may change as tests evolve.
 
 ## 4. Exercise the API directly (curl)
 
@@ -78,24 +86,33 @@ curl -X POST http://localhost:5000/api/analyze -H "Content-Type: application/jso
 
 ## 5. Using the real DDXPlus dataset (optional)
 
-The bundled `data/release_evidences.json` and `data/release_conditions.json`
-are a **small, hand-built demo subset** (12 of 49 pathologies, ~25 of 223
-evidence codes) — see `data/README_DEMO_DATA.md`. They exist so the project
-runs and the test suite passes without any download. The model artifacts
-already in `saved_models/` were trained on the **full** dataset, so
-predictions already work for anything that maps to evidence the model
-recognizes; what's missing without the real files is just the friendly
-question text for codes outside the demo subset, and severity ratings for
-pathologies outside the 12 included.
+The tracked `data/release_evidences.json` and
+`data/release_conditions.json` are runtime DDXPlus metadata containing 223
+evidence definitions and 49 condition definitions. They support decoding,
+explanation, severity, and display behavior. The large patient CSV splits are
+intentionally unbundled and are needed only for retraining/evaluation.
+
+The core artifacts required for normal prediction are:
+
+```text
+saved_models/disease_classifier.pkl
+saved_models/tfidf_vectorizer.pkl
+saved_models/label_encoder.pkl
+saved_models/model_metadata.json
+```
+
+The first three files are distributed through Git LFS. Optional similar-case
+search uses `tfidf_matrix.pkl` and `search_cases.pkl`; if absent, prediction
+and explanation remain available and search degrades gracefully without
+triggering retraining. The simplified classifier is experimental/offline and
+is not part of the canonical chatbot path.
 
 To use the real data:
 
-1. Download `release_evidences.json`, `release_conditions.json`,
-   `train.csv`, `validate.csv`, and `test.csv` from
+1. Download `train.csv`, `validate.csv`, and `test.csv` from
    <https://huggingface.co/datasets/aai530-group6/ddxplus>.
-2. Replace the two JSON files in `data/` with the official ones.
-3. Place the three CSVs in the same `data/` folder.
-4. **Confirm the severity-scale polarity once**, before trusting any
+2. Place the three CSVs in the `data/` folder.
+3. **Confirm the severity-scale polarity once**, before trusting any
    severity-based triage message:
    ```bash
    python3 -m utils.severity_engine
@@ -103,7 +120,7 @@ To use the real data:
    This prints severity values for conditions that are unambiguously
    high- and low-acuity. `utils/severity_engine.py`'s docstring explains
    exactly what to look for and how to flip `SEVERE_END` if needed.
-5. (Optional — the shipped `saved_models/*.pkl` already work) Retrain:
+4. (Optional — the shipped core artifacts already work) Retrain:
    ```bash
    python3 model/train.py
    ```
@@ -121,6 +138,10 @@ python3 -m model.train
 ```
 
 ## 6. Optional extras
+
+The verified default configuration is deterministic: BioBERT, Ollama NLU, and
+the Ollama response formatter are disabled, while the deterministic response
+template is active. Optional components are not required for inference.
 
 ```bash
 pip install -r requirements-optional.txt
@@ -146,7 +167,7 @@ Recommended local LLM split:
 
 ## 7. Production-style serving
 
-The Flask dev server (`python3 server.py`) is fine for local use and demos.
+The Flask dev server (`python server.py`) is fine for local use and demos.
 For anything closer to production:
 
 ```bash
@@ -163,7 +184,7 @@ mid-conversation sessions.
 
 | Symptom | Likely cause / fix |
 |---|---|
-| `ModuleNotFoundError: No module named 'model'` when running a script directly | Run as a module from the project root, e.g. `python3 -m model.train`, or run `python3 server.py` (which already sets up `sys.path` correctly for the whole app). |
-| Predictions seem random / very low confidence everywhere | Expected for evidence codes that don't form a coherent clinical picture (the demo data uses real evidence codes but you're free to mix any). Try one of the example chips for a clean signal. |
+| `ModuleNotFoundError: No module named 'model'` when running a script directly | Run as a module from the project root, e.g. `python -m model.train`, or run `python server.py` (which already sets up `sys.path` correctly for the whole app). |
+| Predictions seem random / very low confidence everywhere | Expected for evidence codes that don't form a coherent clinical picture. Try one of the example chips for a clean signal. |
 | `AttributeError: Can't get attribute ... on <module 'sklearn...'>` when loading `saved_models/*.pkl` | A scikit-learn version mismatch. Reinstall the exact pinned version: `pip install scikit-learn==1.5.2`. |
-| Port 5000 already in use | `FLASK_PORT=5050 python3 server.py`, or set `FLASK_PORT` in `.env`. |
+| Port 5000 already in use | `FLASK_PORT=5050 python server.py`, or set `FLASK_PORT` in `.env`. |

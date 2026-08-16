@@ -4,12 +4,14 @@ This document explains the complete project flow from data loading to model
 training to live chatbot prediction. It is grounded in the current codebase and
 does not add any architecture that is not present in the project.
 
-The project currently has two supervised ML pipelines:
+The project contains two supervised ML pipelines, but only one canonical
+production prediction path:
 
-1. **Primary chat classifier**: simplified disease classifier used by the
-   conversational chatbot when all clinical slots are collected.
-2. **Structured DDXPlus evidence classifier**: older/advanced structured
-   evidence-code model used as fallback and by `/api/case/predict`.
+1. **Structured DDXPlus evidence classifier**: the canonical model used by the
+   chatbot and `/api/case/predict`.
+2. **Simplified disease classifier**: optional/offline experimental model kept
+   for controlled comparison and research; it is not used for normal chatbot
+   routing.
 
 Both are non-RAG. No retrieval pipeline is used for disease prediction.
 
@@ -30,14 +32,12 @@ flowchart TD
     K --> L["Slot Filling"]
     L --> M["Build Case Details"]
     M --> N["Safety Checks"]
-    N --> O["Prediction Path Selection"]
-    O --> P["Primary: Simplified Disease Classifier"]
-    O --> Q["Fallback: Structured Evidence Classifier"]
-    P --> R["Top Disease Predictions"]
-    Q --> R
-    R --> S["Confidence + Severity Triage"]
-    S --> T["Response Formatter"]
-    T --> U["Reply + Meta Returned To Browser"]
+    N --> O["DDXPlus INITIAL_EVIDENCE + evidence codes"]
+    O --> P["Canonical Structured DDXPlus Classifier"]
+    P --> Q["Top Disease Predictions"]
+    Q --> R["Confidence + Severity Triage"]
+    R --> S["Structured Explanation + Response Formatter"]
+    S --> T["Reply + Meta Returned To Browser"]
 ```
 
 Why each high-level stage exists:
@@ -56,13 +56,14 @@ Why each high-level stage exists:
 | Multilingual NLP | Converts English, Hinglish, Marathi, and Romanized Marathi into model-friendly English symptoms. |
 | Slot filling | Collects missing clinical details such as age, severity, duration, and history. |
 | Safety checks | Handles urgent warning signs separately from disease prediction. |
-| Prediction path selection | Uses the primary simplified classifier when available and fallback structured model otherwise. |
+| Canonical prediction | Uses the structured DDXPlus classifier after deterministic evidence extraction. |
 | Confidence and severity triage | Separates strong predictions from weak matches and adds safety warnings. |
 | Response formatting | Converts structured model output into a clear chatbot answer. |
 
-## Pipeline 1: Primary Chat Classifier
+## Pipeline 1: Simplified Offline Classifier
 
-This is the main model used by the chatbot after it collects patient details.
+This is an optional experimental model retained for offline comparison. It is
+not used by the production chatbot.
 
 ### Training File
 
@@ -75,6 +76,10 @@ model/train_disease_classifier.py
 ```text
 data/simplified_train.csv
 ```
+
+This optional comparison dataset and its classifier artifact are not required
+for normal inference and are intentionally not part of the canonical runtime
+package.
 
 Current config:
 
@@ -284,8 +289,8 @@ MEDIUM >= 0.30
 LOW    < 0.30
 ```
 
-This is the primary model path used by the chatbot when `case_details` are
-available and the simplified classifier artifact exists.
+This path is available for offline experiments when the simplified artifact is
+present. It is not the canonical production route.
 
 Why `predict_proba()` is used:
 
@@ -296,9 +301,9 @@ Why `predict_proba()` is used:
 
 ## Pipeline 2: Structured DDXPlus Evidence Classifier
 
-This is the structured evidence-code classifier. It is used by the developer
-endpoint and as fallback when the simplified classifier is not available or
-fails.
+This is the canonical HealthBot prediction model. It is used by the chatbot,
+the structured API endpoint, explanation generation, and the optional
+similar-case feature.
 
 ### Training File
 
@@ -679,16 +684,13 @@ flowchart TD
     L -- "Yes" --> N["Build case_details"]
     N --> O["assess_symptoms()"]
     O --> P["infer_evidence_codes_from_text()"]
-    O --> Q["Scope and weak-evidence checks"]
-    Q --> R["Simplified classifier available?"]
-    R -- "Yes" --> S["predict_disease()"]
-    R -- "No or error" --> T["predict_case()"]
-    S --> U["Top-k diseases + probabilities"]
-    T --> U
-    U --> V["evaluate_differential_severity()"]
-    V --> W["Build response"]
-    W --> X["Optional grounded Ollama formatter"]
-    X --> Y["Return reply + meta"]
+    P --> Q["DDXPlus evidence + INITIAL_EVIDENCE"]
+    Q --> R["predict_case()"]
+    R --> S["Top-k diseases + probabilities"]
+    S --> T["evaluate_differential_severity()"]
+    T --> U["Build deterministic response"]
+    U --> V["Optional grounded Ollama formatter"]
+    V --> W["Return reply + meta"]
 ```
 
 ## Runtime Methods, Use, And Why
@@ -701,11 +703,11 @@ flowchart TD
 | `extract_clinical_details()` | `utils/ollama_nlu_extractor.py` | Optional Ollama JSON extraction for multilingual symptoms/slots | Helps with harder Hindi/Marathi/Hinglish text that dictionaries miss, while keeping the LLM away from disease prediction. |
 | `detect_red_flags()` | `utils/red_flag_rules.py` | Detects urgent symptom patterns | Safety-critical warning signs should be deterministic, testable, and independent of model confidence. |
 | `is_negated()` | `utils/negation.py` | Prevents denied symptoms from being counted | Without negation, text like `no chest pain` could incorrectly trigger chest-pain features and warnings. |
-| `infer_evidence_codes_from_text()` | `utils/ddxplus_decoder.py` | Maps symptom text to DDXPlus evidence codes | The structured fallback model expects evidence codes, not raw user text. |
+| `infer_evidence_codes_from_text()` | `utils/ddxplus_decoder.py` | Maps symptom text to DDXPlus evidence codes | The canonical structured model expects DDXPlus-compatible evidence codes, not raw user text. |
 | `build_model_input()` | `model/predict_disease.py` | Builds simplified classifier input text | Training and inference must use the same text format, otherwise predictions become inconsistent. |
-| `predict_disease()` | `model/predict_disease.py` | Primary chat disease prediction | Uses the supervised simplified classifier after the chat has collected structured details. |
+| `predict_disease()` | `model/predict_disease.py` | Offline simplified-model prediction | Retained for controlled comparison; not used by canonical chatbot routing. |
 | `build_case_feature_text()` | `utils/clinical_case_features.py` | Builds structured evidence feature text | Converts age, sex, initial evidence, and evidence codes into the exact feature tokens used during structured-model training. |
-| `predict_case()` | `model/predictor.py` | Structured DDXPlus fallback/developer prediction | Keeps support for official evidence-code cases and provides a fallback when the simplified classifier is unavailable. |
+| `predict_case()` | `model/predictor.py` | Canonical structured prediction | Converts age, sex, evidence, and DDXPlus-compatible initial evidence into ranked pathology predictions and explanations. |
 | `evaluate_differential_severity()` | `utils/severity_engine.py` | Adds severity-based safety signal | A candidate can be clinically high-acuity even if it is not the top prediction, so severity metadata is checked separately. |
 | `summarize_response()` | `utils/response_summarizer.py` | Default safe deterministic reply | Produces a non-hallucinated answer from structured fields without requiring a local LLM. |
 | `format_with_ollama()` | `utils/ollama_client.py` | Optional grounded LLM response wording | Improves natural language style, but only after predictions are produced and with a verifier to reject unsupported diseases or dosage advice. |
@@ -716,8 +718,8 @@ flowchart TD
 
 Used for:
 
-- Main chatbot disease prediction.
-- Natural user cases after slots are collected.
+- Offline/research comparison on simplified feature inputs.
+- Controlled model evaluation against the structured classifier.
 - Outputs disease names and model probabilities.
 
 Not used for:
@@ -731,12 +733,12 @@ Not used for:
 
 Used for:
 
-- `/api/case/predict`.
-- Structured evidence-code prediction.
-- Fallback when simplified classifier is unavailable.
-- Similar-case search and exact linear-model explanation support.
+- Canonical conversational chatbot prediction.
+- `/api/case/predict` and structured evidence-code prediction.
+- Similar-case search when optional search artifacts are available.
+- Exact linear-model explanation support.
 
-Not used as the primary chat model when the simplified classifier is available.
+The simplified classifier is not used for normal production routing.
 
 ## Complete Data-To-Prediction Summary
 

@@ -30,7 +30,8 @@ matplotlib/graphviz dependency.)*
 
 4. **Chat state machine (`chatbot/bot.py::ChatSession`)** — The conversational
    brain. Tracks which clinical "slots" have been filled (main symptom,
-   duration, severity, age, sex), decides whether to ask a clarifying
+   duration, severity, age, sex, pain location, and relevant history), decides
+   whether to ask a clarifying
    question or commit to an assessment, and orchestrates every NLP/ML step
    below for each turn.
 
@@ -113,9 +114,15 @@ important as correctness of the explanation itself.
 (deliberately **excluding** `DIFFERENTIAL_DIAGNOSIS`, which would leak the
 answer), fits and compares candidate models, and writes everything the
 running app needs to `saved_models/`: the vectorizer, classifier, label
-encoder, a TF-IDF similarity index + case records for the "similar cases"
-feature, and `model_metadata.json` (which `model/predictor.py` checks on
-startup to detect a stale or missing model).
+encoder, a TF-IDF similarity index + case records for the optional "similar
+cases" feature, and `model_metadata.json` (which `model/predictor.py` checks
+when the core predictor is first used to detect a stale or missing model).
+
+The runtime requires the three core classifier artifacts and
+`model_metadata.json`. Missing `tfidf_matrix.pkl` or `search_cases.pkl`
+disables similar-case search only; it does not trigger retraining. The
+simplified classifier is retained for offline comparison and is not used by
+the canonical chatbot prediction path.
 
 ## Validation notes carried over from the pre-Flask refactor
 

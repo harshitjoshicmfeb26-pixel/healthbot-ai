@@ -56,11 +56,9 @@ flowchart TD
     I --> J["Red-flag detector"]
     I --> K["Question policy / slot filling"]
     K --> L["assess_symptoms()"]
-    L --> M["Primary: supervised simplified disease classifier"]
-    L --> N["Fallback: structured DDXPlus evidence classifier"]
-    M --> O["Predictions + confidence"]
-    N --> O
-    O --> P["Severity engine"]
+    L --> M["Canonical: structured DDXPlus evidence classifier"]
+    M --> N["Predictions + confidence"]
+    N --> O["Severity engine"]
     P --> Q["Safe response formatter"]
     Q --> R["Reply + meta back to frontend"]
 ```
@@ -272,9 +270,11 @@ Use in interview:
 
 ## 6. Disease Prediction Models
 
-The project currently has two ML prediction paths.
+The project retains two ML pipelines, but only the structured DDXPlus model is
+used for canonical production prediction. The simplified model is optional and
+offline-only.
 
-### Primary chat model: simplified supervised disease classifier
+### Optional offline model: simplified supervised disease classifier
 
 Files:
 
@@ -345,6 +345,10 @@ macro_f1: 0.993699454076717
 weighted_f1: 0.9949762548282404
 ```
 
+These are saved metrics for the simplified model's synthetic/Dataset-derived
+split, not clinical validation and not evidence that it is superior to the
+canonical structured model.
+
 How prediction works:
 
 1. Build one model input string from structured fields.
@@ -369,7 +373,7 @@ Why this model is suitable:
 - Does not require GPU.
 - Easy to retrain.
 
-### Fallback/advanced model: structured DDXPlus evidence classifier
+### Canonical production model: structured DDXPlus evidence classifier
 
 Files:
 
@@ -418,11 +422,11 @@ Reason:
 
 - It would leak answer information into the model.
 
-This model is used mainly when:
+This model is used for:
 
-- The simplified classifier is unavailable.
-- The structured developer endpoint `/api/case/predict` is used.
-- Evidence-code style prediction is needed.
+- The conversational chatbot's canonical prediction path.
+- The structured `/api/case/predict` endpoint.
+- Evidence-code prediction, explanation, and optional similar-case search.
 
 ## 7. Red Flags and Safety Layer
 
@@ -618,7 +622,7 @@ Why this API design is good:
 | `api/routes.py` | REST API endpoints |
 | `chatbot/bot.py` | Main chatbot state machine and assessment orchestration |
 | `chatbot/session_store.py` | In-memory chat session management |
-| `model/predict_disease.py` | Primary simplified disease classifier inference |
+| `model/predict_disease.py` | Optional offline simplified-model inference |
 | `model/train_disease_classifier.py` | Training script for simplified supervised classifier |
 | `model/predictor.py` | Structured DDXPlus model inference and explanation |
 | `model/train.py` | Training for structured evidence model |
@@ -767,9 +771,10 @@ supervised prediction instead of retrieving text passages.
 
 ### Q4. What model is used for disease prediction?
 
-The primary chat path uses a TF-IDF plus Logistic Regression classifier over
-simplified clinical case fields. There is also a structured DDXPlus fallback
-model using TF-IDF features and an SGD log-loss classifier.
+The canonical chat path uses the structured DDXPlus TF-IDF model with an SGD
+log-loss classifier over age, sex, INITIAL_EVIDENCE, and EVIDENCES. The
+simplified TF-IDF plus Logistic Regression model is retained only for offline
+comparison and research.
 
 ### Q5. Why TF-IDF and Logistic Regression instead of deep learning?
 
@@ -937,10 +942,10 @@ Explain:
 ## 18. One-Minute Explanation
 
 HealthBot is a non-RAG multilingual symptom-checker. The frontend is a simple
-Flask-backed chat UI. The backend keeps a stateful session, normalizes
-symptoms across English, Hinglish, Marathi, and Romanized Marathi, collects
-clinical details, and runs a supervised TF-IDF plus Logistic Regression disease
-classifier. It also has a structured DDXPlus fallback model, red-flag rules,
+Flask-backed chat UI. The backend keeps a process-local in-memory session,
+normalizes symptoms across English, Hinglish, Marathi, and Romanized Marathi,
+collects clinical details, and runs the canonical structured DDXPlus TF-IDF
+classifier. It also has an offline simplified comparison model, red-flag rules,
 negation handling, severity-based safety checks, and optional local Ollama for
 JSON extraction or safe response wording. I avoided using an LLM as the
 diagnosis engine because healthcare predictions need controlled, testable, and

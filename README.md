@@ -27,17 +27,27 @@ to what actually ships.
 ## Quickstart
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python3 server.py
+python server.py                 # Windows: .venv\Scripts\python.exe server.py
 ```
 
 Open **http://localhost:5000**. The chatbot, structured ML predictor, and
-severity engine all work immediately — the repo ships with the real trained
-model artifacts in `saved_models/` and a small demo metadata subset in
-`data/` (see `data/README_DEMO_DATA.md`). Full step-by-step instructions,
-including how to retrain on the real DDXPlus dataset, are in `RUNBOOK.md`.
+severity engine all work immediately when Git LFS has materialized the core
+model files. The tracked runtime metadata contains the complete DDXPlus
+evidence and condition definitions in `data/release_evidences.json` and
+`data/release_conditions.json`. Training CSVs are intentionally not bundled
+because they are only needed for retraining/evaluation. Full step-by-step
+instructions are in [`RUNBOOK.md`](RUNBOOK.md). The architecture walkthrough
+is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), the training/runtime flow
+is [`docs/DATA_TO_TRAINING_TO_PREDICTION_FLOW.md`](docs/DATA_TO_TRAINING_TO_PREDICTION_FLOW.md),
+and DDXPlus attribution is in [`data/README.md`](data/README.md).
+
+Git LFS is required for the core `.pkl` files. After installing Git LFS, use
+normal clone/pull behavior or run `git lfs pull` from the repository root.
+The optional Ollama and BioBERT components are disabled by default and are not
+required for deterministic inference.
 
 ## Project structure
 
@@ -52,7 +62,7 @@ chatbot/
   session_store.py         In-memory session store bridging stateless HTTP to ChatSession
 
 model/
-  predictor.py             Loads saved_models/*.pkl; predict_case(), explain_case(), semantic search
+  predictor.py             Loads core artifacts; prediction, explanation, optional semantic search
   train.py                 Retrains from data/*.csv; compares NB / SGD / optional LightGBM
 
 utils/                     NLP building blocks (each independently unit-tested)
@@ -69,9 +79,9 @@ utils/                     NLP building blocks (each independently unit-tested)
   biobert_embedder.py         Optional semantic symptom matching (heavy, off by default)
 
 static/                    Frontend — index.html, css/style.css, js/app.js (no build step)
-data/                      DDXPlus metadata + demo subset (bring your own train/validate/test.csv)
-saved_models/              Trained model artifacts (vectorizer, classifier, label encoder, search index)
-tests/                     pytest suite — 60+ tests across every utils/ and api/ module
+data/                      Tracked runtime metadata; CSV splits are training/evaluation-only
+saved_models/              Core LFS artifacts plus ignored optional search/experimental artifacts
+tests/                     pytest suite — 170 tests at the current verified release checkpoint
 docs/                      Architecture diagram + its generator script, changelog
 ```
 
@@ -91,14 +101,25 @@ All endpoints are mounted under `/api`. Full request/response examples are in
 | `POST /api/case/predict` | Structured prediction from explicit age/sex/evidence input, plus `explain_case()` |
 | `POST /api/case/from-text` | Infer structured evidence codes from free text, without predicting |
 
+Conversational endpoints use an in-memory, process-local session and collect
+the presenting complaint and relevant slots before prediction. Sessions reset
+when the process restarts; multi-worker deployment requires a shared backend
+such as Redis. `/api/analyze` is stateless and analyzes supplied text directly,
+so it can behave differently from conversational slot filling.
+
+Core prediction uses the structured DDXPlus classifier. Similar-case search is
+optional and uses the ignored `tfidf_matrix.pkl` and `search_cases.pkl`; their
+absence does not disable prediction or explanation. The ignored
+`simplified_disease_classifier.pkl` is retained for offline comparison only.
+
 ## Retraining on the real dataset
 
-The repo ships with **already-trained** model artifacts (`saved_models/`),
-trained on the official DDXPlus dataset (49 pathologies, 200k+ training
-rows — see `saved_models/model_metadata.json`). You don't need to retrain to
-use the app. If you add your own `data/train.csv`, `validate.csv`,
-`test.csv` (from <https://huggingface.co/datasets/aai530-group6/ddxplus>) and
-the full `release_evidences.json` / `release_conditions.json`, retrain with:
+The repo ships with **already-trained** core model artifacts (`saved_models/`),
+trained on the official DDXPlus dataset (49 pathologies, 200k+ training rows;
+see `saved_models/model_metadata.json`). You don't need to retrain to use the
+app, and the large training CSVs are not required for inference. If you obtain
+`data/train.csv`, `validate.csv`, and `test.csv` from the official DDXPlus
+source and want to retrain, run:
 
 ```bash
 python3 model/train.py
@@ -127,6 +148,16 @@ and `.env.example` for how to turn each one on:
   the Naive Bayes / linear baselines during retraining (`model/train.py`).
 
 ## Disclaimer
+
+The current verified release checkpoint contains 170 passing tests. Evidence
+extraction metrics come from the controlled 96-case benchmark and are not
+clinical validation. Classifier metrics are measured on held-out synthetic
+DDXPlus data and are not real-patient diagnostic accuracy. The benchmark
+checkpoint reports positive precision/recall/F1 of 92.19% / 97.52% / 94.78%,
+positive exact-set match of 91.67%, denied precision/recall/F1 of 100% /
+82.76% / 90.57%, initial-evidence accuracy of 64/64 (100%), pseudo-negation
+100%, red-flag F1 of 100%, temporal exact/F1 of 100% / 100%, and contraction
+exact match of 100%.
 
 HealthBot is an educational/portfolio project. It is **not a medical
 device** and does not provide a diagnosis. Every response includes this

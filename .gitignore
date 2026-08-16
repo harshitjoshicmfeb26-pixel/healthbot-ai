@@ -36,11 +36,9 @@ saved_models/*.h5
 # ── Data (raw CSVs — check policy before committing) ─────────
 data/*.csv
 data/*.json
-# Exception: the small, hand-built demo metadata subset is meant to be
-# tracked so the project runs out of the box — see data/README_DEMO_DATA.md
+# Exceptions: tracked DDXPlus runtime metadata; large CSV data remains ignored.
 !data/release_evidences.json
 !data/release_conditions.json
-!data/README_DEMO_DATA.md
 
 # ── Logs ─────────────────────────────────────────────────────
 logs/
