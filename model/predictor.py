@@ -89,13 +89,14 @@ def _metadata_is_current() -> bool:
     return metadata.get("dataset_mode") == DATASET_MODE
 
 
-def _ensure_loaded():
-    global _vectorizer, _clf, _le, _X_search, _search_cases, _metadata
+def _ensure_core_loaded():
+    """Load the classifier artifacts required for core structured inference."""
+    global _vectorizer, _clf, _le, _metadata
 
     if _clf is not None:
         return
 
-    required = [MODEL_PATH, VECTORIZER_PATH, ENCODER_PATH, EMBEDDINGS_PATH, SEARCH_CASES_PATH]
+    required = [MODEL_PATH, VECTORIZER_PATH, ENCODER_PATH]
     if not all(Path(path).exists() for path in required) or not _metadata_is_current():
         print("No current structured clinical model found. Training now ...")
         subprocess.run([sys.executable, str(Path(__file__).parent / "train.py")], check=True)
@@ -103,13 +104,37 @@ def _ensure_loaded():
     _vectorizer = joblib.load(VECTORIZER_PATH)
     _clf = joblib.load(MODEL_PATH)
     _le = joblib.load(ENCODER_PATH)
-    _X_search = joblib.load(EMBEDDINGS_PATH)
-    _search_cases = joblib.load(SEARCH_CASES_PATH)
     _metadata = json.loads(MODEL_METADATA_PATH.read_text(encoding="utf-8"))
 
 
+def _ensure_search_loaded() -> bool:
+    """Load similar-case search artifacts when they are available."""
+    global _X_search, _search_cases
+
+    if _X_search is not None and _search_cases is not None:
+        return True
+    if not Path(EMBEDDINGS_PATH).exists() or not Path(SEARCH_CASES_PATH).exists():
+        _X_search = None
+        _search_cases = None
+        return False
+
+    try:
+        _X_search = joblib.load(EMBEDDINGS_PATH)
+        _search_cases = joblib.load(SEARCH_CASES_PATH)
+    except (FileNotFoundError, OSError, EOFError, ValueError):
+        _X_search = None
+        _search_cases = None
+        return False
+    return True
+
+
+def _ensure_loaded():
+    """Backward-compatible private alias for core model loading."""
+    _ensure_core_loaded()
+
+
 def model_metadata() -> dict:
-    _ensure_loaded()
+    _ensure_core_loaded()
     return dict(_metadata or {})
 
 
@@ -121,7 +146,7 @@ def known_pathology_names() -> List[str]:
     Used by `utils.ollama_client` to verify that a generated explanation
     never names a disease outside this set.
     """
-    _ensure_loaded()
+    _ensure_core_loaded()
     names = []
     for pathology in _le.classes_:
         decoded = decode_condition(str(pathology))
@@ -130,7 +155,7 @@ def known_pathology_names() -> List[str]:
 
 
 def _prediction_rows(feature_text: str, top_n: int, source: str = "structured ML") -> List[Dict]:
-    _ensure_loaded()
+    _ensure_core_loaded()
     if not feature_text.strip():
         return [{
             "rank": 1,
@@ -266,7 +291,7 @@ def explain_case(
     non-empty `note` means explanation is unavailable for this case/model,
     not that no evidence mattered.
     """
-    _ensure_loaded()
+    _ensure_core_loaded()
     feature_text = build_case_feature_text(
         age=age, sex=sex, evidences=evidences, initial_evidence=initial_evidence
     )
@@ -372,7 +397,9 @@ def predict(text: str, top_n: int = 5) -> List[Dict]:
 def _similarity_rows(feature_text: str, top_k: int) -> List[Dict]:
     from sklearn.metrics.pairwise import cosine_similarity
 
-    _ensure_loaded()
+    _ensure_core_loaded()
+    if not _ensure_search_loaded():
+        return []
     if not feature_text.strip():
         return []
 
