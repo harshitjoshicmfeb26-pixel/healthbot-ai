@@ -1,0 +1,5 @@
+{
+  "top1_agreement_rate": 0.9011574457824062,
+  "top3_overlap_rate": 0.9993670218377466,
+  "mean_top3_jaccard_overlap": 0.343670218377466
+}

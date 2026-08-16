@@ -1,0 +1,50 @@
+model_structured,class,recall_structured,f1_structured,support_structured,precision_structured,model_simplified,recall_simplified,f1_simplified,support_simplified,precision_simplified
+structured_native_ddxplus,Acute COPD exacerbation / infection,1.0,1.0,2040,1.0,simplified_reconstructed_ddxplus,1.0,0.9855072463768116,2040,0.9714285714285714
+structured_native_ddxplus,Acute dystonic reactions,1.0,1.0,3252,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3252,1.0
+structured_native_ddxplus,Acute laryngitis,0.990052844264843,0.9942250663336976,3217,0.9984326018808778,simplified_reconstructed_ddxplus,0.8380478706869754,0.9108108108108108,3217,0.9974102848686645
+structured_native_ddxplus,Acute otitis media,0.9997155049786629,0.9998577322520984,3515,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3515,1.0
+structured_native_ddxplus,Acute pulmonary edema,1.0,1.0,2598,1.0,simplified_reconstructed_ddxplus,0.9969207082371054,0.9984579799537394,2598,1.0
+structured_native_ddxplus,Acute rhinosinusitis,0.8201202843083653,0.8968609865470852,1829,0.9894459102902374,simplified_reconstructed_ddxplus,0.37834882449425916,0.5474683544303798,1829,0.9899856938483548
+structured_native_ddxplus,Allergic sinusitis,1.0,1.0,2006,1.0,simplified_reconstructed_ddxplus,0.9995014955134596,0.9997506856145599,2006,1.0
+structured_native_ddxplus,Anaphylaxis,1.0,1.0,3799,1.0,simplified_reconstructed_ddxplus,0.9821005527770466,0.9909694555112882,3799,1.0
+structured_native_ddxplus,Anemia,1.0,1.0,6842,1.0,simplified_reconstructed_ddxplus,0.9997076878105817,0.9998538225405642,6842,1.0
+structured_native_ddxplus,Atrial fibrillation,1.0,1.0,2789,1.0,simplified_reconstructed_ddxplus,1.0,0.9992834109638122,2789,0.9985678481919084
+structured_native_ddxplus,Boerhaave,1.0,1.0,2083,1.0,simplified_reconstructed_ddxplus,0.7018722995679308,0.8248236953455571,2083,1.0
+structured_native_ddxplus,Bronchiectasis,1.0,1.0,2384,1.0,simplified_reconstructed_ddxplus,0.9987416107382551,0.9993704092339979,2384,1.0
+structured_native_ddxplus,Bronchiolitis,1.0,1.0,35,1.0,simplified_reconstructed_ddxplus,1.0,0.9859154929577465,35,0.9722222222222222
+structured_native_ddxplus,Bronchitis,0.9997217584863661,0.9998608598859051,3594,1.0,simplified_reconstructed_ddxplus,0.7081246521981079,0.8291252647010914,3594,1.0
+structured_native_ddxplus,Bronchospasm / acute asthma exacerbation,1.0,1.0,2057,1.0,simplified_reconstructed_ddxplus,1.0,1.0,2057,1.0
+structured_native_ddxplus,Chagas,1.0,1.0,1077,1.0,simplified_reconstructed_ddxplus,0.4921077065923863,0.6596141879278158,1077,1.0
+structured_native_ddxplus,Chronic rhinosinusitis,0.9941754641427011,0.9405889443774754,2747,0.892483660130719,simplified_reconstructed_ddxplus,0.6243174372042228,0.6925095901473854,2747,0.7774252039891206
+structured_native_ddxplus,Cluster headache,1.0,1.0,2825,1.0,simplified_reconstructed_ddxplus,0.9309734513274336,0.9642529789184234,2825,1.0
+structured_native_ddxplus,Croup,0.99375,0.9968652037617555,320,1.0,simplified_reconstructed_ddxplus,0.99375,0.9953051643192489,320,0.9968652037617555
+structured_native_ddxplus,Ebola,1.0,1.0,100,1.0,simplified_reconstructed_ddxplus,1.0,0.9852216748768473,100,0.970873786407767
+structured_native_ddxplus,Epiglottitis,1.0,1.0,2364,1.0,simplified_reconstructed_ddxplus,0.9052453468697124,0.9502664298401421,2364,1.0
+structured_native_ddxplus,GERD,0.9997177533163986,0.9998588567395907,3543,1.0,simplified_reconstructed_ddxplus,0.9946373130115721,0.9973114475732276,3543,1.0
+structured_native_ddxplus,Guillain-Barré syndrome,1.0,0.9997973657548126,2467,0.9995948136142626,simplified_reconstructed_ddxplus,1.0,1.0,2467,1.0
+structured_native_ddxplus,HIV (initial infection),1.0,1.0,3919,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3919,1.0
+structured_native_ddxplus,Influenza,1.0,1.0,3554,1.0,simplified_reconstructed_ddxplus,0.9954980303882949,0.9977439368302312,3554,1.0
+structured_native_ddxplus,Inguinal hernia,1.0,1.0,2751,1.0,simplified_reconstructed_ddxplus,1.0,1.0,2751,1.0
+structured_native_ddxplus,Larygospasm,1.0,0.9958333333333333,239,0.991701244813278,simplified_reconstructed_ddxplus,1.0,0.9958333333333333,239,0.991701244813278
+structured_native_ddxplus,Localized edema,1.0,1.0,3734,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3734,1.0
+structured_native_ddxplus,Myasthenia gravis,0.999537251272559,0.9997685720897941,2161,1.0,simplified_reconstructed_ddxplus,1.0,1.0,2161,1.0
+structured_native_ddxplus,Myocarditis,0.9979702300405954,0.9989840839823908,1478,1.0,simplified_reconstructed_ddxplus,0.976319350473613,0.9779735682819384,1478,0.9796334012219959
+structured_native_ddxplus,PSVT,1.0,0.9987562189054726,2409,0.9975155279503105,simplified_reconstructed_ddxplus,1.0,0.2943908102163021,2409,0.17260156194024504
+structured_native_ddxplus,Pancreatic neoplasm,1.0,1.0,2585,1.0,simplified_reconstructed_ddxplus,1.0,1.0,2585,1.0
+structured_native_ddxplus,Panic attack,1.0,1.0,3387,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3387,1.0
+structured_native_ddxplus,Pericarditis,1.0,1.0,3095,1.0,simplified_reconstructed_ddxplus,0.6390953150242327,0.7798147053025823,3095,1.0
+structured_native_ddxplus,Pneumonia,1.0,1.0,3542,1.0,simplified_reconstructed_ddxplus,1.0,1.0,3542,1.0
+structured_native_ddxplus,Possible NSTEMI / STEMI,0.9996564754379939,0.9998282082116475,2911,1.0,simplified_reconstructed_ddxplus,0.9742356578495363,0.9869497128936836,2911,1.0
+structured_native_ddxplus,Pulmonary embolism,1.0,1.0,3679,1.0,simplified_reconstructed_ddxplus,0.9793422125577602,0.9895633067838506,3679,1.0
+structured_native_ddxplus,Pulmonary neoplasm,1.0,0.9997381513485205,1909,0.9994764397905759,simplified_reconstructed_ddxplus,1.0,0.8036202904651653,1909,0.6717100633356791
+structured_native_ddxplus,SLE,1.0,1.0,1564,1.0,simplified_reconstructed_ddxplus,0.9961636828644501,0.9974391805377721,1564,0.9987179487179487
+structured_native_ddxplus,Sarcoidosis,1.0,1.0,2902,1.0,simplified_reconstructed_ddxplus,0.9993108201240524,0.9996552912788693,2902,1.0
+structured_native_ddxplus,Scombroid food poisoning,1.0,1.0,2486,1.0,simplified_reconstructed_ddxplus,1.0,0.9865079365079366,2486,0.9733750978856696
+structured_native_ddxplus,Spontaneous pneumothorax,1.0,1.0,1343,1.0,simplified_reconstructed_ddxplus,0.9590469099032017,0.9790954009882175,1343,1.0
+structured_native_ddxplus,Spontaneous rib fracture,1.0,1.0,778,1.0,simplified_reconstructed_ddxplus,0.9884318766066839,0.9941822882999354,778,1.0
+structured_native_ddxplus,Stable angina,1.0,0.9752707950132843,2386,0.9517351416035101,simplified_reconstructed_ddxplus,0.9543168482816429,0.9646261385299725,2386,0.9751605995717345
+structured_native_ddxplus,Tuberculosis,1.0,1.0,2037,1.0,simplified_reconstructed_ddxplus,1.0,1.0,2037,1.0
+structured_native_ddxplus,URTI,0.9998856227839414,0.9999428081212468,8743,1.0,simplified_reconstructed_ddxplus,0.8102481985588471,0.8951225676017185,8743,0.9998588567395907
+structured_native_ddxplus,Unstable angina,0.9583333333333334,0.9787234042553191,2880,1.0,simplified_reconstructed_ddxplus,0.9777777777777777,0.9713694377371508,2880,0.9650445510623715
+structured_native_ddxplus,Viral pharyngitis,0.9994000479961603,0.9977837675950884,8334,0.9961727066140413,simplified_reconstructed_ddxplus,0.44012479001679866,0.6112314614230961,8334,1.0
+structured_native_ddxplus,Whooping cough,1.0,1.0,417,1.0,simplified_reconstructed_ddxplus,1.0,1.0,417,1.0

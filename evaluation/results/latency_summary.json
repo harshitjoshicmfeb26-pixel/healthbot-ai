@@ -1,0 +1,13 @@
+{
+  "latency_sample_policy": "first 2,000 rows after exact-duplicate exclusion; models loaded once",
+  "structured_warm_inference": {
+    "sample_rows": 2000,
+    "median_ms_per_row": 1.8473500003892696,
+    "p95_ms_per_row": 2.92176500079222
+  },
+  "simplified_warm_inference": {
+    "sample_rows": 2000,
+    "median_ms_per_row": 1.604699999006698,
+    "p95_ms_per_row": 2.468280000357481
+  }
+}

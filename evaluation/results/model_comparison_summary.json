@@ -1,0 +1,154 @@
+{
+  "protocol": {
+    "evaluation_population": "official test.csv minus normalized exact train-record duplicates",
+    "structured_input": "native DDXPlus evidence feature text",
+    "simplified_input": "reconstructed DDXPlus-derived text and slots",
+    "clinical_superiority_claim": false
+  },
+  "population": {
+    "original_test_rows": 134529,
+    "excluded_exact_train_duplicates": 1823,
+    "remaining_rows": 132706,
+    "remaining_feature_level_train_overlap": 166,
+    "train_exact_identity_count": 1015440,
+    "train_feature_identity_count": 1012347
+  },
+  "mapping_coverage": {
+    "pain_location": 106580,
+    "previous_disease_or_history": 132706,
+    "genetic_or_family_history": 24451,
+    "severity": 110402,
+    "total_rows": 132706,
+    "coverage_fraction": {
+      "pain_location": 0.8031287206305668,
+      "previous_disease_or_history": 1.0,
+      "genetic_or_family_history": 0.18424939339592783,
+      "severity": 0.8319292270130966
+    },
+    "severity_values": {
+      "pain intensity: 6": 10388,
+      "pain intensity: 5": 11966,
+      "pain intensity: 2": 8351,
+      "pain intensity: 7": 10460,
+      "pain intensity: 1; pain intensity: 4": 502,
+      "pain intensity: 1": 4454,
+      "pain intensity: 9": 6552,
+      "pain intensity: 8": 9917,
+      "pain intensity: 2; pain intensity: 7": 534,
+      "pain intensity: 3": 10871,
+      "pain intensity: 5; pain intensity: 7": 421,
+      "pain intensity: 3; pain intensity: 5": 819,
+      "pain intensity: 10": 3563,
+      "pain intensity: 4": 11021,
+      "pain intensity: 0; pain intensity: 8": 612,
+      "pain intensity: 0; pain intensity: 3": 960,
+      "pain intensity: 3; pain intensity: 8": 356,
+      "pain intensity: 2; pain intensity: 3": 800,
+      "pain intensity: 0; pain intensity: 5": 1000,
+      "pain intensity: 1; pain intensity: 5": 582,
+      "pain intensity: 3; pain intensity: 4": 710,
+      "pain intensity: 0; pain intensity: 6": 949,
+      "pain intensity: 4; pain intensity: 5": 540,
+      "pain intensity: 3; pain intensity: 6": 650,
+      "pain intensity: 2; pain intensity: 4": 750,
+      "pain intensity: 2; pain intensity: 8": 358,
+      "pain intensity: 0; pain intensity: 2": 879,
+      "pain intensity: 0; pain intensity: 4": 928,
+      "pain intensity: 0": 1829,
+      "pain intensity: 4; pain intensity: 6": 473,
+      "pain intensity: 1; pain intensity: 2": 460,
+      "pain intensity: 2; pain intensity: 5": 745,
+      "pain intensity: 2; pain intensity: 6": 725,
+      "pain intensity: 0; pain intensity: 7": 734,
+      "pain intensity: 4; pain intensity: 8": 231,
+      "pain intensity: 0; pain intensity: 1": 722,
+      "pain intensity: 6; pain intensity: 8": 225,
+      "pain intensity: 1; pain intensity: 7": 399,
+      "pain intensity: 1; pain intensity: 6": 431,
+      "pain intensity: 6; pain intensity: 7": 333,
+      "pain intensity: 3; pain intensity: 7": 526,
+      "pain intensity: 3; pain intensity: 9": 134,
+      "pain intensity: 0; pain intensity: 9": 142,
+      "pain intensity: 2; pain intensity: 9": 146,
+      "pain intensity: 1; pain intensity: 3": 589,
+      "pain intensity: 1; pain intensity: 9": 128,
+      "pain intensity: 1; pain intensity: 8": 214,
+      "pain intensity: 5; pain intensity: 6": 503,
+      "pain intensity: 4; pain intensity: 7": 447,
+      "pain intensity: 7; pain intensity: 8": 162,
+      "pain intensity: 5; pain intensity: 8": 211
+    },
+    "duration": {
+      "unknown_rows": 132706,
+      "non_unknown_rows": 0
+    }
+  },
+  "cold_load": {
+    "combined_artifact_load_seconds": 0.19847110000046086
+  },
+  "models": [
+    {
+      "model": "structured_native_ddxplus",
+      "rows": 132706,
+      "top1_accuracy": 0.9961343119376668,
+      "macro_f1": 0.995358048132827,
+      "weighted_f1": 0.9960840586212326,
+      "top3_accuracy": 1.0,
+      "top5_accuracy": 1.0,
+      "mean_max_confidence": 0.9437834058652547,
+      "median_max_confidence": 0.9573621953506899,
+      "confidence_quantiles": {
+        "0.1": 0.9140933863151508,
+        "0.25": 0.9419977265055188,
+        "0.5": 0.9573621953506899,
+        "0.75": 0.9666087876068516,
+        "0.9": 0.9733970368079539
+      },
+      "mean_confidence_correct": 0.9449549595482459,
+      "mean_confidence_incorrect": 0.6418902362440261,
+      "ece_10_bins": 0.0523509060724123,
+      "multiclass_brier": 0.011149359481420873
+    },
+    {
+      "model": "simplified_reconstructed_ddxplus",
+      "rows": 132706,
+      "top1_accuracy": 0.8996428194655856,
+      "macro_f1": 0.9294068871235756,
+      "weighted_f1": 0.9180263277216345,
+      "top3_accuracy": 0.993685289286091,
+      "top5_accuracy": 0.9984703027745543,
+      "mean_max_confidence": 0.5517038930605824,
+      "median_max_confidence": 0.5281864981251053,
+      "confidence_quantiles": {
+        "0.1": 0.15158851169822485,
+        "0.25": 0.23268697785615278,
+        "0.5": 0.5281864981251053,
+        "0.75": 0.8681561038737537,
+        "0.9": 0.975160474261231
+      },
+      "mean_confidence_correct": 0.5963569129899036,
+      "mean_confidence_incorrect": 0.1514159561840407,
+      "ece_10_bins": 0.3479389264050031,
+      "multiclass_brier": 0.3242384756877507
+    }
+  ],
+  "agreement": {
+    "top1_agreement_rate": 0.9011574457824062,
+    "top3_overlap_rate": 0.9993670218377466,
+    "mean_top3_jaccard_overlap": 0.343670218377466
+  },
+  "latency": {
+    "latency_sample_policy": "first 2,000 rows after exact-duplicate exclusion; models loaded once",
+    "structured_warm_inference": {
+      "sample_rows": 2000,
+      "median_ms_per_row": 1.8473500003892696,
+      "p95_ms_per_row": 2.92176500079222
+    },
+    "simplified_warm_inference": {
+      "sample_rows": 2000,
+      "median_ms_per_row": 1.604699999006698,
+      "p95_ms_per_row": 2.468280000357481
+    }
+  },
+  "elapsed_seconds": 317.6310286000007
+}
