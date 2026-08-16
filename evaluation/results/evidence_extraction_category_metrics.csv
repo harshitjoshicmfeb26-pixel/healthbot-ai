@@ -1,7 +1,7 @@
 average_false_positive_count,exact_set_match_rate,f1,false_negative_count,false_positive_count,group,precision,recall,rows,true_positive_count,utterances_with_false_positive_pct,utterances_with_missed_evidence_pct
 0.0,1.0,1.0,0,0,A_canonical_english,1.0,1.0,4,5,0.0,0.0
 0.25,0.75,0.9090909090909091,0,1,B_english_synonym,0.8333333333333334,1.0,4,5,25.0,0.0
-0.0,0.0,0.0,6,0,C_typo,0.0,0.0,4,0,0.0,100.0
+0.0,1.0,1.0,0,0,C_typo,1.0,1.0,4,6,0.0,0.0
 0.0,1.0,1.0,0,0,D_conversational,1.0,1.0,4,6,0.0,0.0
 0.0,1.0,1.0,0,0,E_hinglish,1.0,1.0,4,8,0.0,0.0
 0.0,1.0,1.0,0,0,F_marathi_devanagari,1.0,1.0,4,7,0.0,0.0
@@ -12,7 +12,7 @@ average_false_positive_count,exact_set_match_rate,f1,false_negative_count,false_
 0.5,0.75,0.0,0,2,K_multiple_negated,0.0,0.0,4,0,25.0,0.0
 0.5,0.75,0.8,0,2,L_mixed_polarity,0.6666666666666666,1.0,4,4,25.0,0.0
 0.0,1.0,1.0,0,0,M_temporal_reassertion,1.0,1.0,4,7,0.0,0.0
-0.0,0.75,0.9090909090909091,1,0,N_pseudo_negation,1.0,0.8333333333333334,4,5,0.0,25.0
+0.0,1.0,1.0,0,0,N_pseudo_negation,1.0,1.0,4,6,0.0,0.0
 0.0,1.0,1.0,0,0,O_multiple_positive,1.0,1.0,4,14,0.0,0.0
 0.5,0.75,0.7272727272727272,1,2,P_pain_location,0.6666666666666666,0.8,4,4,25.0,25.0
 0.0,0.75,0.9090909090909091,1,0,Q_pain_intensity,1.0,0.8333333333333334,4,5,0.0,25.0

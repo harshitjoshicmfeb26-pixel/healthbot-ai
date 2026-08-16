@@ -7,33 +7,33 @@
     "production_code_modified": false
   },
   "positive_evidence": {
-    "precision": 0.9173553719008265,
-    "recall": 0.9173553719008265,
-    "f1": 0.9173553719008265,
-    "true_positive_count": 111,
+    "precision": 0.921875,
+    "recall": 0.9752066115702479,
+    "f1": 0.9477911646586346,
+    "true_positive_count": 118,
     "false_positive_count": 10,
-    "false_negative_count": 10,
-    "exact_set_match_rate": 0.8645833333333334,
+    "false_negative_count": 3,
+    "exact_set_match_rate": 0.9166666666666666,
     "average_false_positive_count": 0.10416666666666667,
     "utterances_with_false_positive_pct": 6.25,
-    "utterances_with_missed_evidence_pct": 8.333333333333334
+    "utterances_with_missed_evidence_pct": 3.125
   },
   "denied_evidence": {
-    "precision": 0.96,
+    "precision": 1.0,
     "recall": 0.8275862068965517,
-    "f1": 0.888888888888889,
+    "f1": 0.9056603773584906,
     "true_positive_count": 24,
-    "false_positive_count": 1,
+    "false_positive_count": 0,
     "false_negative_count": 5,
-    "exact_set_match_rate": 0.9583333333333334,
-    "average_false_positive_count": 0.010416666666666666,
-    "utterances_with_false_positive_pct": 1.0416666666666667,
+    "exact_set_match_rate": 0.96875,
+    "average_false_positive_count": 0.0,
+    "utterances_with_false_positive_pct": 0.0,
     "utterances_with_missed_evidence_pct": 3.125
   },
   "initial_evidence": {
     "defined_case_count": 64,
-    "correct_count": 59,
-    "accuracy": 0.921875
+    "correct_count": 64,
+    "accuracy": 1.0
   },
   "red_flags": {
     "case_count": 96,
@@ -46,16 +46,16 @@
     {
       "group": "english",
       "rows": 71,
-      "precision": 0.875,
-      "recall": 0.875,
-      "f1": 0.875,
-      "true_positive_count": 70,
+      "precision": 0.8850574712643678,
+      "recall": 0.9625,
+      "f1": 0.9221556886227545,
+      "true_positive_count": 77,
       "false_positive_count": 10,
-      "false_negative_count": 10,
-      "exact_set_match_rate": 0.8169014084507042,
+      "false_negative_count": 3,
+      "exact_set_match_rate": 0.8873239436619719,
       "average_false_positive_count": 0.14084507042253522,
       "utterances_with_false_positive_pct": 8.450704225352112,
-      "utterances_with_missed_evidence_pct": 11.267605633802816
+      "utterances_with_missed_evidence_pct": 4.225352112676056
     },
     {
       "group": "hinglish",
@@ -146,16 +146,16 @@
     {
       "group": "C_typo",
       "rows": 4,
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1": 0.0,
-      "true_positive_count": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive_count": 6,
       "false_positive_count": 0,
-      "false_negative_count": 6,
-      "exact_set_match_rate": 0.0,
+      "false_negative_count": 0,
+      "exact_set_match_rate": 1.0,
       "average_false_positive_count": 0.0,
       "utterances_with_false_positive_pct": 0.0,
-      "utterances_with_missed_evidence_pct": 100.0
+      "utterances_with_missed_evidence_pct": 0.0
     },
     {
       "group": "D_conversational",
@@ -301,15 +301,15 @@
       "group": "N_pseudo_negation",
       "rows": 4,
       "precision": 1.0,
-      "recall": 0.8333333333333334,
-      "f1": 0.9090909090909091,
-      "true_positive_count": 5,
+      "recall": 1.0,
+      "f1": 1.0,
+      "true_positive_count": 6,
       "false_positive_count": 0,
-      "false_negative_count": 1,
-      "exact_set_match_rate": 0.75,
+      "false_negative_count": 0,
+      "exact_set_match_rate": 1.0,
       "average_false_positive_count": 0.0,
       "utterances_with_false_positive_pct": 0.0,
-      "utterances_with_missed_evidence_pct": 25.0
+      "utterances_with_missed_evidence_pct": 0.0
     },
     {
       "group": "O_multiple_positive",
@@ -453,8 +453,7 @@
     }
   ],
   "failure_class_counts": {
-    "lexical coverage gap": 6,
-    "typo failure": 4,
+    "lexical coverage gap": 5,
     "negation-scope error": 2,
     "ambiguity": 2,
     "negation trigger gap": 1,
