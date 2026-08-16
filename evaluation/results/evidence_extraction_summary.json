@@ -31,9 +31,9 @@
     "utterances_with_missed_evidence_pct": 3.125
   },
   "initial_evidence": {
-    "defined_case_count": 75,
-    "correct_count": 53,
-    "accuracy": 0.7066666666666667
+    "defined_case_count": 64,
+    "correct_count": 59,
+    "accuracy": 0.921875
   },
   "red_flags": {
     "case_count": 96,

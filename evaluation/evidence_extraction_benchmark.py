@@ -36,6 +36,10 @@ from utils.red_flag_rules import detect_red_flags  # noqa: E402
 CASE_PATH = Path(__file__).with_name("evidence_benchmark_cases.json")
 RESULTS_DIR = Path(__file__).with_name("results")
 
+# Expected INITIAL_EVIDENCE follows official DDXPlus semantics: categorical
+# pain details remain in EVIDENCES, while the presenting complaint uses its
+# base code. Antecedent-only cases intentionally have no initial evidence.
+
 
 def load_cases(path: Path = CASE_PATH) -> list[dict[str, Any]]:
     cases = json.loads(path.read_text(encoding="utf-8"))
@@ -64,6 +68,10 @@ def validate_cases(cases: list[dict[str, Any]]) -> None:
             base, _ = split_evidence_code(expected_initial)
             if base not in metadata:
                 raise ValueError(f"{case['id']}: unknown initial evidence code {expected_initial}")
+            if "_@_" in expected_initial:
+                raise ValueError(f"{case['id']}: INITIAL_EVIDENCE must use a base code")
+            if metadata[base].get("is_antecedent"):
+                raise ValueError(f"{case['id']}: antecedent evidence cannot be INITIAL_EVIDENCE")
 
 
 def _error_classes(case: dict[str, Any], actual_positive: set[str], actual_denied: set[str], red_flag_match: bool) -> list[str]:
@@ -116,7 +124,8 @@ def run_cases(cases: list[dict[str, Any]]) -> list[dict[str, Any]]:
         inferred = infer_evidence_codes_from_text(text, include_denied=True)
         positive = sorted({item["code"] for item in inferred if not item.get("negated")})
         denied = sorted({item["code"] for item in inferred if item.get("negated")})
-        actual_initial = select_initial_evidence([{"code": code} for code in positive]) if positive else ""
+        positive_matches = [item for item in inferred if not item.get("negated")]
+        actual_initial = select_initial_evidence(positive_matches) if positive_matches else ""
         red_flag = detect_red_flags(text)
         expected_red = case.get("expected_red_flag")
         errors = _error_classes(case, set(positive), set(denied), red_flag["has_red_flag"] == expected_red) if expected_red is not None else []

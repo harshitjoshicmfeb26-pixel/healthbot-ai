@@ -17,6 +17,7 @@ from utils.ddxplus_decoder import (
     infer_evidence_codes_from_text,
     select_initial_evidence,
 )
+from utils.red_flag_rules import detect_red_flags
 
 
 def test_decode_evidence_binary():
@@ -105,7 +106,57 @@ def test_hinglish_headache_sore_throat_fever_aliases():
 
 def test_select_initial_evidence_prefers_specific_code_over_generic_pain():
     matches = infer_evidence_codes_from_text("burning urination with lower back pain")
-    assert select_initial_evidence(matches) == "E_55_@_V_185"
+    assert select_initial_evidence(matches) == "E_53"
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("chest pain", "E_53"),
+        ("fever and cough", "E_91"),
+        ("family asthma and cough", "E_201"),
+        ("previous diabetes and chest pain", "E_53"),
+        ("mala taap ani khokla aahe", "E_91"),
+        ("no fever but I have cough", "E_201"),
+        ("I had no chest pain yesterday but today it started", "E_53"),
+    ],
+)
+def test_initial_evidence_uses_context_and_source_order(text, expected):
+    matches = infer_evidence_codes_from_text(text, include_denied=True)
+    assert select_initial_evidence(matches) == expected
+
+
+@pytest.mark.parametrize("text", ["pain in the groin", "groin pain"])
+def test_ambiguous_location_initial_evidence_falls_back_to_pain_base(text):
+    matches = infer_evidence_codes_from_text(text)
+    assert select_initial_evidence(matches) == "E_53"
+
+
+@pytest.mark.parametrize("text", ["severe pain", "sharp pain", "burning pain"])
+def test_categorical_pain_detail_is_preserved_but_initial_uses_base(text):
+    matches = infer_evidence_codes_from_text(text)
+    assert any("_@_" in item["code"] for item in matches)
+    assert select_initial_evidence(matches) == "E_53"
+
+
+@pytest.mark.parametrize("text", ["family asthma", "previous diabetes"])
+def test_antecedent_only_input_has_no_initial_evidence(text):
+    matches = infer_evidence_codes_from_text(text)
+    assert matches
+    assert select_initial_evidence(matches) == ""
+
+
+def test_current_symptom_outranks_antecedent_without_losing_history():
+    matches = infer_evidence_codes_from_text("previous diabetes and chest pain")
+    assert {item["code"] for item in matches} >= {"E_69", "E_53"}
+    assert select_initial_evidence(matches) == "E_53"
+
+
+def test_initial_base_normalization_does_not_change_red_flag_detection():
+    text = "chest pain"
+    matches = infer_evidence_codes_from_text(text)
+    assert select_initial_evidence(matches) == "E_53"
+    assert detect_red_flags(text)["has_red_flag"] is True
 
 
 @pytest.mark.parametrize(

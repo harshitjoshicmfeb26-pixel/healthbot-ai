@@ -1,15 +1,15 @@
 id,category,language,input_text,detected_language,normalized_text,actual_positive_evidence,actual_denied_evidence,expected_positive_evidence,expected_denied_evidence,expected_initial_evidence,actual_initial_evidence,expected_red_flag,actual_red_flag,matched_red_flags,error_classes,notes
 B04,B_english_synonym,english,I feel like vomiting,english,vomiting,E_148; E_211,,E_148,,E_148,E_148,False,False,,lexical coverage gap,conversational synonym
 C01,C_typo,english,coughh and fevr,english,coughh and fevr,,,E_201; E_91,,E_201,,False,False,,typo failure,known typo failure
-C02,C_typo,english,headeche,english,headeche,,,E_53; E_55_@_V_11,,E_55_@_V_11,,False,False,,typo failure,misspelled headache
+C02,C_typo,english,headeche,english,headeche,,,E_53; E_55_@_V_11,,E_53,,False,False,,typo failure,misspelled headache; base-code INITIAL_EVIDENCE
 C03,C_typo,english,nausous,english,nausous,,,E_148,,E_148,,False,False,,typo failure,misspelled nausea
 C04,C_typo,english,wheezng,english,wheezng,,,E_214,,E_214,,False,False,,typo failure,misspelled wheezing
 J02,J_contraction_negation,english,I can't breathe,english,I can't breathe,,,,E_66,,,False,False,,negation trigger gap,contraction and safety edge
-K02,K_multiple_negated,english,I deny fever and cough,english,fever cough,E_201; E_91,,,E_201; E_91,,E_201,False,False,,negation-scope error; lexical coverage gap,shared trigger
-L02,L_mixed_polarity,english,I deny chest pain but have shortness of breath,english,chest pain shortness of breath,E_53; E_55_@_V_29; E_66,,E_66,E_53; E_55_@_V_29,E_66,E_55_@_V_29,True,True,chest pain; shortness of breath,negation-scope error; lexical coverage gap,mixed safety case
+K02,K_multiple_negated,english,I deny fever and cough,english,fever cough,E_201; E_91,,,E_201; E_91,,E_91,False,False,,negation-scope error; lexical coverage gap,shared trigger
+L02,L_mixed_polarity,english,I deny chest pain but have shortness of breath,english,chest pain shortness of breath,E_53; E_55_@_V_29; E_66,,E_66,E_53; E_55_@_V_29,E_66,E_66,True,True,chest pain; shortness of breath,negation-scope error; lexical coverage gap,mixed safety case
 N02,N_pseudo_negation,english,Cough cannot be ruled out,english,cough,,E_201,E_201,,E_201,,False,False,,lexical coverage gap,pseudo-negation
-P03,P_pain_location,english,pain in the groin,english,pain in the groin,E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,lexical coverage gap,laterality intentionally unresolved
-Q04,Q_pain_intensity,english,severe chest pain,english,chest pain,E_53; E_55_@_V_29,,E_53; E_55_@_V_29; E_56_@_8,,E_55_@_V_29,E_55_@_V_29,True,True,severe chest pain; chest pain,categorical mapping error,known intensity/location interaction
-S04,S_previous_history,english,I have had pneumonia before,english,I have had pneumonia before,,,E_118,,E_118,,False,False,,lexical coverage gap,antecedent history
-X02,X_ambiguous,english,pain somewhere,english,pain somewhere,E_55,,,,,E_55,False,False,,ambiguity,generic pain without location
-X03,X_ambiguous,english,groin pain,english,groin pain,E_53; E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_55_@_V_16,False,False,,ambiguity,laterality unresolved
+P03,P_pain_location,english,pain in the groin,english,pain in the groin,E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_53,False,False,,lexical coverage gap,laterality intentionally unresolved
+Q04,Q_pain_intensity,english,severe chest pain,english,chest pain,E_53; E_55_@_V_29,,E_53; E_55_@_V_29; E_56_@_8,,E_53,E_53,True,True,severe chest pain; chest pain,categorical mapping error,known intensity/location interaction; base-code INITIAL_EVIDENCE
+S04,S_previous_history,english,I have had pneumonia before,english,I have had pneumonia before,,,E_118,,,,False,False,,lexical coverage gap,antecedent-only history; no DDXPlus INITIAL_EVIDENCE
+X02,X_ambiguous,english,pain somewhere,english,pain somewhere,E_55,,,,,E_53,False,False,,ambiguity,generic pain without location
+X03,X_ambiguous,english,groin pain,english,groin pain,E_53; E_55_@_V_16; E_55_@_V_17,,E_53,,E_53,E_53,False,False,,ambiguity,laterality unresolved

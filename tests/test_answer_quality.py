@@ -20,7 +20,7 @@ def test_urinary_symptom_scope_limitation_blocks_disease_prediction():
     result = assess_symptoms("burning urination with lower back pain for 2 days female age 30", top_n=3)
 
     assert result["evidence_bridge"]["mode"] == "model_scope_limited"
-    assert result["evidence_bridge"]["initial_evidence"] == "E_55_@_V_185"
+    assert result["evidence_bridge"]["initial_evidence"] == "E_53"
     assert result["evidence_bridge"]["scope_warning"]["reason"] == "urinary_evidence_outside_model_scope"
     assert result["predictions"][0]["flag"] == "INFO"
     assert result["predictions"][0]["score_type"] == "not run"
