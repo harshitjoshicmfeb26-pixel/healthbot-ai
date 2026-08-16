@@ -1,16 +1,17 @@
 """
 docs/generate_architecture_diagram.py
 ────────────────────────────────────────
-Regenerates docs/architecture_diagram.svg from scratch.
+Legacy architecture-diagram generator retained for historical reference.
 
 Deliberately dependency-free (plain string templating, no matplotlib/
 graphviz) so the diagram can be regenerated in any environment without
 installing anything extra — run:
 
-    python3 docs/generate_architecture_diagram.py
+    python docs/generate_architecture_diagram.py
 
-Edit the box/arrow layout below if the architecture changes; this script
-is the source of truth for the diagram, not the SVG file itself.
+The final release uses the checked-in docs/architecture_diagram.svg directly.
+This older generator is not the release source of truth and should not be run
+to replace the final diagram without first bringing its layout up to date.
 """
 
 from __future__ import annotations

@@ -30,7 +30,7 @@
   <rect width="1500" height="1120" fill="#ffffff"/>
   <rect x="0" y="0" width="1500" height="82" fill="#f0f8f6"/>
   <text x="55" y="38" class="title">HealthBot — final verified runtime architecture</text>
-  <text x="55" y="62" class="subtitle">Structured clinical NLP assistant · deterministic DDXPlus evidence pipeline · safety escalation independent of pathology ranking</text>
+  <text x="55" y="62" class="subtitle">Structured clinical NLP assistant · deterministic DDXPlus evidence pipeline · red-flag escalation independent; severity adds a differential signal</text>
 
   <text x="55" y="116" class="section">1  INTERFACE / API</text>
   <rect x="55" y="135" width="230" height="78" rx="10" class="runtime" filter="url(#shadow)"/>
@@ -69,8 +69,8 @@
   <text x="55" y="770" class="section">4  RESPONSE + INDEPENDENT SAFETY PATH</text>
   <rect x="1110" y="750" width="165" height="86" rx="10" class="support" filter="url(#shadow)"/><text x="1192" y="779" text-anchor="middle" class="box-title">Explanation layer</text><text x="1192" y="801" text-anchor="middle" class="mono">structured feature</text><text x="1192" y="818" text-anchor="middle" class="mono">contributions</text><path d="M1192 711 V750" class="flow-green"/>
   <rect x="1110" y="875" width="165" height="78" rx="10" class="runtime" filter="url(#shadow)"/><text x="1192" y="902" text-anchor="middle" class="box-title">User response</text><text x="1192" y="924" text-anchor="middle" class="mono">reply + predictions + meta</text><text x="1192" y="941" text-anchor="middle" class="small">back to browser / API</text><path d="M1192 836 V875" class="flow-green"/>
-  <rect x="80" y="800" width="285" height="86" rx="10" class="safety" filter="url(#shadow)"/><text x="222" y="827" text-anchor="middle" class="box-title">Current / extracted symptoms</text><text x="222" y="850" text-anchor="middle" class="mono">red-flag keywords + severity slots</text><text x="222" y="869" text-anchor="middle" class="small">does not require top pathology</text>
-  <rect x="420" y="800" width="245" height="86" rx="10" class="safety" filter="url(#shadow)"/><text x="542" y="827" text-anchor="middle" class="box-title">Red-flag + severity rules</text><text x="542" y="850" text-anchor="middle" class="mono">independent safety signal</text><text x="542" y="869" text-anchor="middle" class="small">negation-aware triage</text>
+  <rect x="80" y="800" width="285" height="86" rx="10" class="safety" filter="url(#shadow)"/><text x="222" y="827" text-anchor="middle" class="box-title">Current / extracted symptoms</text><text x="222" y="850" text-anchor="middle" class="mono">red-flag keywords + severity slots</text><text x="222" y="869" text-anchor="middle" class="small">red flags do not require top pathology</text>
+  <rect x="420" y="800" width="245" height="86" rx="10" class="safety" filter="url(#shadow)"/><text x="542" y="827" text-anchor="middle" class="box-title">Red-flag + severity rules</text><text x="542" y="850" text-anchor="middle" class="mono">red flags independent; severity supplements</text><text x="542" y="869" text-anchor="middle" class="small">negation-aware triage</text>
   <rect x="720" y="800" width="245" height="86" rx="10" class="safety" filter="url(#shadow)"/><text x="842" y="827" text-anchor="middle" class="box-title">Urgent guidance</text><text x="842" y="850" text-anchor="middle" class="mono">routine / urgent / emergency</text><text x="842" y="869" text-anchor="middle" class="small">response priority</text>
   <path d="M365 843 H420" class="flow-red"/><path d="M665 843 H720" class="flow-red"/><path d="M965 843 H1070 V914 H1110" class="flow-red"/><text x="1000" y="832" class="small" fill="#b45309">priority override / warning</text>
 

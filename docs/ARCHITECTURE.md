@@ -6,9 +6,8 @@ end to end.
 
 ![Architecture diagram](architecture_diagram.svg)
 
-*(Regenerate with `python3 docs/generate_architecture_diagram.py` if the
-architecture changes — it's a plain-Python SVG generator, no
-matplotlib/graphviz dependency.)*
+*The checked-in SVG is the release architecture artifact. If the architecture
+changes, update the diagram and validate the SVG before release.*
 
 ## Request lifecycle, step by step
 
@@ -39,8 +38,11 @@ matplotlib/graphviz dependency.)*
    - `utils/language_detector.py` — English / Hinglish / Marathi
      (Devanagari) / Romanized Marathi, by script + keyword scoring.
    - `utils/multilingual_normalizer.py` — maps symptom phrases in any of
-     those languages to canonical English terms (exact phrase match, then
-     `utils/fuzzy_symptom_matcher.py` for near-misses).
+     those languages to canonical English terms. It applies exact and
+     validated deterministic mappings first, then uses
+     `utils/fuzzy_symptom_matcher.py` only for conservative normalization
+     candidates; fuzzy candidates are not automatically promoted into
+     classifier evidence.
    - `utils/negation.py` — a small, dependency-free NegEx-style negation
      detector (trigger phrase + bounded scope + pseudo-negation guard), so
      "no chest pain" is never counted as chest pain. Why not
@@ -61,16 +63,16 @@ matplotlib/graphviz dependency.)*
    vectorizer + classifier, and returns a ranked list of pathologies with
    confidence scores. Also exposes `explain_case()` — see below.
 
-7. **Severity & response (`utils/severity_engine.py`,
-   `utils/response_summarizer.py`, `utils/ollama_client.py`)** — The
-   severity engine is a *second*, independent safety signal: it checks the
-   official DDXPlus per-pathology severity rating against the model's
-   current top-k differential, so a high-acuity condition still surfaces a
-   warning even if it's not the top-ranked prediction and even if no
-   keyword red flag matched. The response is then formatted — by the
-   deterministic template summarizer by default, or by a local Ollama
-   model if explicitly enabled, gated by a grounding verifier that rejects
-   any rewrite naming an unsupported disease or a drug dosage.
+7. **Safety & response (`utils/red_flag_rules.py`,
+   `utils/severity_engine.py`, `utils/response_summarizer.py`,
+   `utils/ollama_client.py`)** — Red-flag rules form an independent safety
+   path from current/extracted symptoms and do not require the classifier's
+   top pathology. The severity engine is an additional signal over the
+   classifier's current top-k differential, using official DDXPlus severity
+   metadata. The response is formatted by the deterministic template
+   summarizer by default, or by a local Ollama model if explicitly enabled,
+   gated by a grounding verifier that rejects any rewrite naming an
+   unsupported disease or a drug dosage.
 
 8. **Back to the browser** — The API returns `{reply, meta}`; `meta`
    carries the structured predictions, red-flag status, severity message,
@@ -80,10 +82,12 @@ matplotlib/graphviz dependency.)*
 ## Why a linear model, and why that makes explainability free
 
 `model/train.py` compares a Multinomial Naive Bayes baseline against a
-linear `SGDClassifier` (log-loss), and an optional LightGBM candidate, by
-top-5 validation accuracy — see `saved_models/model_comparison.csv` for the
-actual numbers from the last training run. The linear model has won every
-run so far on this feature set.
+linear `SGDClassifier` (log-loss), and an optional LightGBM candidate, using
+top-k accuracy and F1 metrics. The saved production artifact is
+`sgd_log_loss`: the selection policy prefers the best explainable model within
+the configured metric tolerance, rather than claiming that the linear model
+wins every raw metric. See `saved_models/model_comparison.csv` for the
+candidate metrics from the recorded training run.
 
 That matters beyond accuracy: a linear model's prediction is *exactly*
 
@@ -100,8 +104,8 @@ code from a TF-IDF token that collapsed DDXPlus's `_@_` value separator
 during vectorization (see the function's docstring for that specific
 detail — it's the one non-obvious bit in an otherwise direct calculation).
 
-If a future non-linear candidate (the optional LightGBM path) is ever
-selected instead, `explain_case()` fails closed: it returns an explicit
+If the optional LightGBM candidate is selected during a future retraining run,
+`explain_case()` fails closed: it returns an explicit
 `"explanation unavailable for this model"` note rather than a wrong or
 approximated one. Correctness of the *absence* of an explanation is as
 important as correctness of the explanation itself.

@@ -84,7 +84,7 @@ curl -X POST http://localhost:5000/api/analyze -H "Content-Type: application/jso
   -d '{"text": "49 year old female with cough, nausea, heartburn and stomach pain"}'
 ```
 
-## 5. Using the real DDXPlus dataset (optional)
+## 5. Using the official synthetic DDXPlus dataset (optional)
 
 The tracked `data/release_evidences.json` and
 `data/release_conditions.json` are runtime DDXPlus metadata containing 223
@@ -115,14 +115,14 @@ To use the real data:
 3. **Confirm the severity-scale polarity once**, before trusting any
    severity-based triage message:
    ```bash
-   python3 -m utils.severity_engine
+   python -m utils.severity_engine
    ```
    This prints severity values for conditions that are unambiguously
    high- and low-acuity. `utils/severity_engine.py`'s docstring explains
    exactly what to look for and how to flip `SEVERE_END` if needed.
 4. (Optional — the shipped core artifacts already work) Retrain:
    ```bash
-   python3 model/train.py
+   python model/train.py
    ```
    This re-fits the TF-IDF vectorizer + classifier comparison (Naive Bayes
    vs. linear SGD, plus LightGBM if `USE_LIGHTGBM_CANDIDATE=True` and
@@ -134,7 +134,7 @@ Run training as a module if you ever see `ModuleNotFoundError` for an
 internal import:
 
 ```bash
-python3 -m model.train
+   python -m model.train
 ```
 
 ## 6. Optional extras
@@ -150,24 +150,27 @@ pip install -r requirements-optional.txt
 Then in `.env` (copy from `.env.example` if you haven't already):
 
 ```bash
-BIOBERT_ENABLED=True                  # semantic symptom matching
+BIOBERT_ENABLED=True                  # optional semantic fallback/matching
 OLLAMA_ENABLED=True                   # requires a local Ollama install
 USE_OLLAMA_RESPONSE_FORMATTER=True
 OLLAMA_MODEL=qwen2.5:7b                # any model you've already `ollama pull`ed
 OLLAMA_NLU_ENABLED=True                # optional JSON symptom/slot extractor, not a diagnosis engine
-OLLAMA_NLU_MODEL=qwen3.5:9b             # best local choice here for Hindi/Marathi/Hinglish extraction
+OLLAMA_NLU_MODEL=qwen3.5:9b             # choose a locally available model for optional extraction
 USE_LIGHTGBM_CANDIDATE=True            # adds LightGBM to model/train.py's comparison
 ```
 
 Recommended local LLM split:
 
-- `OLLAMA_NLU_MODEL=qwen3.5:9b` for multilingual symptom/slot extraction.
-- `OLLAMA_MODEL=medgemma:4b` or `qwen3.5:9b` only for final response wording.
+- Choose an Ollama model appropriate for your local installation for optional
+  multilingual symptom/slot extraction.
+- Use Ollama only for optional final response wording.
 - Keep the supervised classifier as the only disease prediction engine.
 
 ## 7. Production-style serving
 
 The Flask dev server (`python server.py`) is fine for local use and demos.
+This repository is an educational/portfolio prototype, not a public clinical
+deployment. It has no authentication, and its sessions are process-local.
 For anything closer to production:
 
 ```bash

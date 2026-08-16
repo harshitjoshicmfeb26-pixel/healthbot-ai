@@ -623,14 +623,14 @@ Why this API design is good:
 | `chatbot/bot.py` | Main chatbot state machine and assessment orchestration |
 | `chatbot/session_store.py` | In-memory chat session management |
 | `model/predict_disease.py` | Optional offline simplified-model inference |
-| `model/train_disease_classifier.py` | Training script for simplified supervised classifier |
+| `model/train_disease_classifier.py` | Training script for optional simplified supervised classifier |
 | `model/predictor.py` | Structured DDXPlus model inference and explanation |
 | `model/train.py` | Training for structured evidence model |
 | `utils/language_detector.py` | Language/script detection |
-| `utils/medical_synonyms.py` | Symptom dictionaries |
+| `utils/medical_synonyms.py` | Multilingual aliases and validated typo mappings |
 | `utils/multilingual_normalizer.py` | Converts multilingual text to English symptoms |
 | `utils/ollama_nlu_extractor.py` | Optional LLM JSON extractor |
-| `utils/fuzzy_symptom_matcher.py` | Fuzzy phrase matching |
+| `utils/fuzzy_symptom_matcher.py` | Conservative fuzzy normalization candidates |
 | `utils/ddxplus_decoder.py` | Evidence-code decoding and text-to-code mapping |
 | `utils/red_flag_rules.py` | Safety keyword detection |
 | `utils/negation.py` | Negation handling |
@@ -640,7 +640,8 @@ Why this API design is good:
 | `static/` | Browser frontend |
 | `tests/` | Unit and API tests |
 | `saved_models/` | Saved trained artifacts |
-| `data/` | Dataset and metadata files |
+| `data/` | Tracked runtime metadata; large CSV splits are training/evaluation-only |
+| `evaluation/` | Controlled model-comparison and evidence-benchmark tooling/results |
 
 ## 12. Testing and Validation
 
@@ -662,7 +663,7 @@ Important test areas:
 Recent validation result:
 
 ```text
-73 passed
+170 passed
 ```
 
 Warnings seen during local tests:
@@ -680,8 +681,10 @@ Use these points in interviews:
 1. It is non-RAG and supervised, so prediction is controlled.
 2. It separates NLU, prediction, safety, and response generation.
 3. It avoids target leakage in training.
-4. It supports multiple language styles using dictionaries, fuzzy matching,
-   and optional local LLM extraction.
+4. It supports multiple language styles using deterministic dictionaries,
+   validated typo mappings, conservative fuzzy candidates, and optional local
+   LLM extraction. Fuzzy candidates are not automatically promoted into
+   classifier evidence.
 5. It uses red-flag rules independent of model probabilities.
 6. It uses severity metadata as a second safety signal.
 7. It has session-based multi-turn chat, not just one-shot classification.
@@ -697,8 +700,9 @@ Current limitations:
 
 - It is not a medical device.
 - It depends on the quality and coverage of the dataset.
-- Full Hindi Devanagari support is improved by Ollama NLU but not fully
-  dictionary-covered yet.
+- Coverage depends on the deterministic multilingual vocabulary; optional
+  Ollama NLU can extract additional slots when explicitly enabled, but is not
+  required for the canonical path.
 - The chat question policy is mostly fixed-slot based.
 - In-memory sessions are not production-grade for multi-worker deployment.
 - Confidence can be low for broad or contradictory symptoms.
@@ -816,9 +820,11 @@ high accuracy.
 ### Q8. How does the chatbot understand Marathi or Hinglish?
 
 It uses a multilingual normalizer with dictionaries for English, Hinglish,
-Marathi Devanagari, and Romanized Marathi. It also has fuzzy matching. For
-harder multilingual text, there is an optional Ollama NLU extractor using
-`qwen3.5:9b` that returns JSON symptoms and slots.
+Marathi Devanagari, and Romanized Marathi, plus a small validated typo map.
+The fuzzy matcher generates conservative normalization candidates; those
+candidates are not automatically bridged into classifier evidence. For harder
+multilingual text, an optional Ollama NLU extractor can return JSON symptoms
+and slots when enabled.
 
 ### Q9. Does the LLM diagnose disease?
 
@@ -833,9 +839,9 @@ component.
 
 ### Q11. Which Ollama model is best here?
 
-For multilingual extraction, `qwen3.5:9b` is the best local option among the
-available models. For medical-style explanation, `medgemma:4b` can be used as
-a response formatter. `phi3:mini` is a faster lightweight fallback.
+The repository does not prescribe a best Ollama model. Choose a locally
+available model appropriate for optional extraction or response formatting;
+the canonical runtime does not depend on Ollama.
 
 ### Q12. How do you handle red flags?
 
@@ -846,9 +852,10 @@ warning as "chest pain".
 
 ### Q13. What is the severity engine?
 
-The severity engine checks whether any disease in the current candidate list
-has a high-acuity severity rating from condition metadata. It is a second
-safety signal independent of keyword red flags.
+The red-flag rules are independent of the classifier ranking. Separately, the
+severity engine checks whether any disease in the current candidate list has a
+high-acuity rating from DDXPlus condition metadata, providing an additional
+safety signal alongside the direct red-flag path.
 
 ### Q14. What happens if model confidence is low?
 
@@ -858,10 +865,12 @@ additional clinical details before running the final classifier.
 
 ### Q15. Why does adding age or duration sometimes not change confidence much?
 
-Because the current simplified model still represents all fields inside one
-text vector. Age and duration are included, but symptoms often dominate the
-TF-IDF signal. A future improvement is a structured model with separate
-numeric and categorical feature pipelines.
+Because the current models represent features as tokens. In particular, the
+simplified training artifact receives duration as `unknown` and derives
+severity from a pain-intensity pattern, so conversational duration/severity
+slots are not evidence of a learned duration feature. The canonical structured
+model uses age, sex, initial evidence, and DDXPlus evidence tokens. A future
+improvement would use separate numeric and categorical pipelines where useful.
 
 ### Q16. How is the final answer generated?
 

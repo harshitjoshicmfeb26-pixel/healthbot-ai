@@ -27,9 +27,10 @@ flowchart TD
     F --> G["Run Flask App"]
     G --> H["User Sends Chat Message"]
     H --> I["SessionStore Loads ChatSession"]
-    I --> J["Multilingual NLP Normalization"]
-    J --> K["Optional Ollama NLU JSON Extraction"]
-    K --> L["Slot Filling"]
+    I --> J["Deterministic NLP Normalization"]
+    J -. optional fallback .-> K["Optional Ollama NLU JSON Extraction"]
+    J --> L["Slot Filling"]
+    K -. optional result .-> L
     L --> M["Build Case Details"]
     M --> N["Safety Checks"]
     N --> O["DDXPlus INITIAL_EVIDENCE + evidence codes"]
@@ -44,7 +45,7 @@ Why each high-level stage exists:
 
 | Stage | Why it exists |
 |---|---|
-| Raw data files | Source clinical examples used to train supervised models. |
+| Raw data files | Synthetic DDXPlus examples used to train supervised models. |
 | Data validation | Prevents training on missing or wrong columns. |
 | Leakage removal | Keeps the model honest by excluding fields that already contain answer-like disease names. |
 | Feature building | Converts raw clinical columns into a consistent ML input format. |
@@ -150,6 +151,15 @@ pain location: chest previous disease: diabetes
 family history: family heart disease
 ```
 
+The training builder leaves `duration` as `unknown` because the simplified
+training script does not pass a duration field. Its `severity` token is also
+derived only from a `pain intensity: N` pattern inside `symptoms_text`. The
+runtime helper accepts duration and severity slots, but this artifact was not
+trained on the runtime duration field and its severity contract is not
+identical to conversational severity input. The simplified model is therefore
+retained for controlled offline comparison, not as a canonical production
+engine.
+
 ### Train/Test Split
 
 Method used:
@@ -225,12 +235,12 @@ Why each method is used:
 | `max_iter=1000` | Gives the optimizer enough iterations to converge on a larger TF-IDF feature space. |
 | `n_jobs=-1` | Uses available CPU cores to speed up training. |
 
-Why this is better than an LLM for disease prediction:
+Why it is retained as an offline baseline:
 
 - The dataset is labeled, so this is a supervised classification problem.
-- The classifier predicts only among the trained disease classes.
+- The classifier predicts only among its trained disease classes.
 - The model output is controlled and testable.
-- An LLM may generate disease names outside the training label set.
+- Its metrics do not establish superiority over the canonical structured model.
 
 ### Evaluation Metrics
 
@@ -326,6 +336,10 @@ train_rows_used = 200001
 validate_rows_used = 49999
 test_rows_used = 49999
 ```
+
+These are sampled rows used by the saved artifact, not the full official split
+sizes. DDXPlus patient records are synthetic; the CSV files are training and
+evaluation inputs, not runtime dependencies.
 
 ### Required Columns
 
@@ -549,7 +563,7 @@ Why each candidate exists:
 | `SGDClassifier(loss="log_loss")` | Linear classifier suitable for large sparse TF-IDF matrices. `log_loss` allows probability-style outputs through decision scores. |
 | `penalty="elasticnet"` | Combines L1 and L2 regularization, helping with sparse text features and reducing overfitting. |
 | `class_weight="balanced"` | Helps classes with fewer examples. |
-| Optional `LightGBM` | Included as an optional stronger non-linear candidate, but not required. It is off by default to keep dependencies light. |
+| Optional `LightGBM` | Included as an optional non-linear comparison candidate, not required for runtime, and off by default to keep dependencies light. |
 
 Why the current selected model is `sgd_log_loss`:
 
@@ -699,7 +713,7 @@ flowchart TD
 |---|---|---|---|
 | `normalize_symptoms()` | `utils/multilingual_normalizer.py` | Converts multilingual symptom text to canonical English symptoms | The ML models are trained on English/structured clinical signals, so user language must be normalized before prediction. |
 | `detect_language()` | `utils/language_detector.py` | Detects English/Hinglish/Marathi/Romanized Marathi/mixed | The response and normalization strategy depend on whether the user typed Latin, Devanagari, or mixed text. |
-| `fuzzy_match_symptoms()` | `utils/fuzzy_symptom_matcher.py` | Handles near-miss symptom phrases | Users make spelling mistakes and use flexible phrasing; fuzzy matching improves coverage without needing an LLM for every message. |
+| `fuzzy_match_symptoms()` | `utils/fuzzy_symptom_matcher.py` | Generates conservative near-miss normalization candidates | Candidate generation can help inspect flexible phrasing, but fuzzy results are not automatically promoted into DDXPlus classifier evidence. |
 | `extract_clinical_details()` | `utils/ollama_nlu_extractor.py` | Optional Ollama JSON extraction for multilingual symptoms/slots | Helps with harder Hindi/Marathi/Hinglish text that dictionaries miss, while keeping the LLM away from disease prediction. |
 | `detect_red_flags()` | `utils/red_flag_rules.py` | Detects urgent symptom patterns | Safety-critical warning signs should be deterministic, testable, and independent of model confidence. |
 | `is_negated()` | `utils/negation.py` | Prevents denied symptoms from being counted | Without negation, text like `no chest pain` could incorrectly trigger chest-pain features and warnings. |
