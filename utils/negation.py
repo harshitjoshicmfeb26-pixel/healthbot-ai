@@ -85,7 +85,8 @@ POST_NEGATION_TRIGGERS: tuple[str, ...] = (
 # Phrases that contain a negation trigger as a substring but do not actually
 # negate what follows/precedes them (classic NegEx "pseudo-negation" list).
 PSEUDO_NEGATION_TRIGGERS: tuple[str, ...] = (
-    "not ruled out", "cannot rule out", "can not rule out",
+    "not ruled out", "cannot be ruled out", "can not be ruled out",
+    "cannot rule out", "can not rule out",
     "not certain if", "not certain whether", "not sure if",
     "not only", "no increase", "no further increase", "no change",
 )

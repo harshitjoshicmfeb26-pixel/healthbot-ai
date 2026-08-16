@@ -127,6 +127,40 @@ def test_temporal_reassertion_overrides_historical_negation(text, phrase):
     assert is_negated(text, span[0], span[1]) is False
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Cough cannot be ruled out",
+        "Cough can not be ruled out",
+        "Cough cannot rule out",
+        "Cough not ruled out",
+        "Cannot rule out cough",
+        "Not sure if I have cough",
+        "Not only cough, I also have fever",
+    ],
+)
+def test_supported_pseudo_negation_phrases_remain_positive(text):
+    span = find_phrase_span(text, "cough")
+    assert span is not None
+    assert is_negated(text, span[0], span[1]) is False
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Cough ruled out",
+        "Cough was ruled out",
+        "No cough",
+        "I don't have cough",
+        "Cough resolved",
+    ],
+)
+def test_true_negation_remains_negation(text):
+    span = find_phrase_span(text, "cough")
+    assert span is not None
+    assert is_negated(text, span[0], span[1]) is True
+
+
 def test_historical_negative_without_reassertion_stays_negated():
     text = "I had no fever yesterday"
     span = find_phrase_span(text, "fever")
