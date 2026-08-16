@@ -201,6 +201,18 @@ ROMAN_MARATHI_SYMPTOM_MAP = {
 }
 
 
+# Narrow, validated misspellings handled by the deterministic normalizer.
+# These are intentionally kept separate from the fuzzy vocabulary so they
+# cannot broaden fuzzy candidate generation or lower its safety threshold.
+DETERMINISTIC_TYPO_MAP = {
+    "coughh": "cough",
+    "fevr": "fever",
+    "headeche": "headache",
+    "nausous": "nausea",
+    "wheezng": "wheezing",
+}
+
+
 FILLER_WORDS = {
     "i", "have", "has", "am", "is", "are", "and", "or", "with", "the", "a",
     "an", "my", "me", "mujhe", "hai", "aur", "ko", "mein", "me", "ka",
@@ -224,6 +236,7 @@ def merged_symptom_map() -> dict[str, str]:
     merged: dict[str, str] = {}
     for symptom_map in all_symptom_maps().values():
         merged.update(symptom_map)
+    merged.update(DETERMINISTIC_TYPO_MAP)
     return merged
 
 
